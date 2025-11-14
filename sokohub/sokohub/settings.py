@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'accounts',
     'orders',
     'products',
-    'REST_FRAMEWORK',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -113,6 +114,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Static files (CSS, JavaScript, Images)
