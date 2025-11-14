@@ -1,0 +1,159 @@
+﻿{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Soko Hub{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Checkout</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" id="checkout-form">
+                    {% csrf_token %}
+
+                    <!-- Order Summary -->
+                    <div class="mb-4">
+                        <h5>Order Summary</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded">
+                                        {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                            <span class="text-muted">No image</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1">{{ product.name }}</h6>
+                                        <p class="text-muted mb-1 small">{{ product.vendor.username }}</p>
+                                        <p class="mb-1">Price: ${{ product.price }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-2">
+                                            <label for="id_quantity" class="form-label">Quantity:</label>
+                                            {{ form.quantity }}
+                                        </div>
+                                        <p class="mb-0">
+                                            <strong>Stock: </strong>
+                                            <span id="stock-display" class="{% if product.stock > 0 %}text-success{% else %}text-danger{% endif %}">
+                                                {{ product.stock }} available
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="mb-4">
+                        <h5>Delivery Information</h5>
+                        {{ form.delivery_address|as_crispy_field }}
+                        {{ form.phone|as_crispy_field }}
+                    </div>
+
+                    <!-- Order Total -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <strong>Total:</strong>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <strong id="order-total">${{ product.price }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="place-order-btn">
+                            Place Order
+                        </button>
+                        <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-secondary w-100 mt-2">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Order Review</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Product:</span>
+                    <span>{{ product.name }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Unit Price:</span>
+                    <span>${{ product.price }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Quantity:</span>
+                    <span id="review-quantity">1</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <strong>Total:</strong>
+                    <strong id="review-total">${{ product.price }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6>Need Help?</h6>
+                <p class="small text-muted mb-0">
+                    If you have any questions about your order, please contact our support team.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const quantityInput = document.getElementById('id_quantity');
+        const price = {{ product.price }};
+        const maxStock = {{ product.stock }};
+
+        function updateTotals() {
+            const quantity = parseInt(quantityInput.value) || 1;
+            const total = price * quantity;
+
+            // Update display totals
+            document.getElementById('order-total').textContent = '$' + total.toFixed(2);
+            document.getElementById('review-total').textContent = '$' + total.toFixed(2);
+            document.getElementById('review-quantity').textContent = quantity;
+
+            // Validate stock
+            if (quantity > maxStock) {
+                quantityInput.setCustomValidity(`Only ${maxStock} items available`);
+                document.getElementById('place-order-btn').disabled = true;
+            } else {
+                quantityInput.setCustomValidity('');
+                document.getElementById('place-order-btn').disabled = false;
+            }
+        }
+
+        quantityInput.addEventListener('input', updateTotals);
+        quantityInput.addEventListener('change', updateTotals);
+
+        // Initial update
+        updateTotals();
+    });
+</script>
+{% endblock %}

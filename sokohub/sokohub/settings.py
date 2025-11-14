@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'orders',
     'products',
     'rest_framework',
+    'rest_framework_jwt'
+    
+    'rest_framework',
     'rest_framework_simplejwt',
 ]
 
@@ -59,7 +62,7 @@ ROOT_URLCONF = 'sokohub.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,8 +117,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-AUTH_USER_MODEL = 'accounts.User'
 
 
 # Static files (CSS, JavaScript, Images)

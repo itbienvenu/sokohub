@@ -1,0 +1,85 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Soko Hub{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">🎉 Order Placed Successfully!</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h3>Thank You for Your Order!</h3>
+                    <p class="lead">Your order has been received and is being processed.</p>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Order Number:</strong> #{{ order.id }}</p>
+                                <p><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+                                <p><strong>Status:</strong>
+                                    <span class="badge bg-{{ order.get_status_color }}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Total Amount:</strong> ${{ order.total }}</p>
+                                <p><strong>Delivery Address:</strong> {{ order.delivery_address }}</p>
+                                <p><strong>Contact Phone:</strong> {{ order.phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Order Items</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for item in order.items.all %}
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-2">
+                                {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="img-fluid rounded">
+                                {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 60px;">
+                                    <span class="text-muted small">No image</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-1">{{ item.product.name }}</h6>
+                                <p class="text-muted mb-0 small">Vendor: {{ item.product.vendor.username }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <p class="mb-1">{{ item.quantity }} x ${{ item.price }}</p>
+                                <strong>Subtotal: ${{ item.get_subtotal }}</strong>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}<hr>{% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <a href="{% url 'customer_orders' %}" class="btn btn-primary me-2">
+                        View My Orders
+                    </a>
+                    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
