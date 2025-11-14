@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Login</h4>
+            </div>
+
+            <div class="card-body">
+
+                <div id="msgBox"></div>
+
+                <form id="loginForm">
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input id="username" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input id="password" type="password" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const msgBox = document.getElementById('msgBox');
+    msgBox.innerHTML = "";
+
+    const payload = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    };
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/account/login/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // Store token
+            localStorage.setItem("access", data.access);
+            localStorage.setItem("refresh", data.refresh);
+
+            msgBox.innerHTML = `<div class="alert alert-success">Login successful!</div>`;
+        } else {
+            msgBox.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        }
+
+    } catch (err) {
+        msgBox.innerHTML = `<div class="alert alert-danger">Server error</div>`;
+    }
+});
+</script>
+
+{% endblock %}

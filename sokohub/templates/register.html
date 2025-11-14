@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Create Account</h4>
+            </div>
+
+            <div class="card-body">
+                <!-- Message Box -->
+                <div id="msgBox"></div>
+
+                <form id="registerForm">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input id="username" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input id="email" type="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input id="phone" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <input id="location" type="text" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">User Type</label>
+                        <select id="user_type" class="form-control" required>
+                            <option value="vendor">Vendor</option>
+                            <option value="customer">Customer</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input id="password" type="password" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input id="password2" type="password" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// Submit form
+document.getElementById('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const msgBox = document.getElementById('msgBox');
+    msgBox.innerHTML = "";
+
+    const payload = {
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        location: document.getElementById('location').value,
+        user_type: document.getElementById('user_type').value,
+        password: document.getElementById('password').value,
+        password2: document.getElementById('password2').value,
+    };
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/account/register/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            msgBox.innerHTML = `
+                <div class="alert alert-success">Account created successfully! 🎉</div>
+            `;
+        } else {
+            msgBox.innerHTML = `
+                <div class="alert alert-danger">${data.error || "Registration failed"}</div>
+            `;
+        }
+
+    } catch (error) {
+        msgBox.innerHTML = `<div class="alert alert-danger">Server error</div>`;
+    }
+
+});
+</script>
+
+{% endblock %}
