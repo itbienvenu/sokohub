@@ -34,7 +34,7 @@ def accounts_list(request):
             'message':"Account created well"
         }
 
-        return render(request, 'account/login.html', context)
+        return redirect('user-login')
 
 
 
@@ -52,9 +52,26 @@ def user_login(request):
 
         email = request.POST.get("user_email")
         password = request.POST.get("user_password")
+        try:
+            user = Account.objects.get(email=email) 
+            user_password = user.password
+            if user_password == password:
+                if user.user_type == 'customer':
+                    return redirect('customer-dashboard')
+                elif user.user_type == 'vendor':
+                    return redirect('vendor-dashboard')
+            else:
+                raise ValueError("Invalid email or password")
+        except:
+            raise ValueError("Invalid email or password")
+        
+    elif request.method == "GET":
+        return render(request, 'account/login.html')
+    else:
+        return render(request, 'account/login.html')
 
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            return render(request, 'account/home.html', context="")
-        else:
-            return render(request, 'account/login.html', {"error":"Invalid email or password"})
+def vendor_dashboard(request):
+    return render(request, 'account/vendor_page.html')
+
+def customer_dashboard(request):
+    return render(request, 'account/customer_page.html')

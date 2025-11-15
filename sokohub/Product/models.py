@@ -2,7 +2,7 @@ from django.db import models
 from Account.models import Account
 # Create your models here.
 class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
+    product_id = models.CharField(primary_key=True)
     user_id = models.ForeignKey(Account,on_delete = models.CASCADE)
     image = models.CharField()
     status = models.BooleanField(default=True)
