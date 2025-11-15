@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 /.venv
 .venv/
 /__pycache__/
 __pycache__/
 db.sqlite3
 .venv
+=======
+.venv
+*/__pycache__/
+>>>>>>> itbienvenu
