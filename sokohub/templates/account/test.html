@@ -1,9 +1,14 @@
-<html>
+{% extends 'base.html' %}
 
-    
-    {% for user in accounts  %}
-        <h1>{{user}}</h1>
-    {% endfor %}
-        
+{% block title %}All Accounts - SokoHub{% endblock %}
 
-</html>
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">All User Accounts</h1>
+    <ul class="list-group">
+        {% for user in accounts %}
+            <li class="list-group-item">{{ user.name }} ({{ user.email }}) - Role: {{ user.role }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
