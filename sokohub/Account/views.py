@@ -26,7 +26,7 @@ def accounts_list(request):
             email=email, 
             phone=phone, 
             password=password, 
-            role=role
+            user_type=role
             )
         new_account.save()
 
