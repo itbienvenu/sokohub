@@ -1,11 +1,12 @@
 <section>
-    <form>
+    <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
+        {% csrf_token %}
         <label> Name:</label>
         <input type="text" name ="product_name">
         <label> Description :</label>
         <textarea name="product_description"></textarea>
         <label>Price:</label>
-        <input type="text" name="procuct_price">
+        <input type="text" name="product_price">
         <label>Stock:</label>
         <input type="text" name="product_stock">
         <label>Quantity:</label>
@@ -13,6 +14,6 @@
         <label>Image Upload:</label> 
         <input typ="file" name="product_image">
         
-        <input type="button" value="Submit">
+        <input type="submit" value="Submit">
     </form>
 </section>

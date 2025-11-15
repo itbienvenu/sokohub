@@ -55,6 +55,9 @@ def user_login(request):
         try:
             user = Account.objects.get(email=email) 
             user_password = user.password
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
+            
             if user_password == password:
                 if user.user_type == 'customer':
                     return redirect('customer-dashboard')
