@@ -20,7 +20,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    {% if user.is_authenticated %}
+                    {% comment %} {% if user.is_authenticated %}
                         {# --- Logged-in Users --- #}
 
                         {# Common for all logged-in users #}
@@ -58,11 +58,11 @@
                         <li class="nav-item">
                             <a class="nav-link {% if 'products' in request.path %}active{% endif %}" href="#">Products</a>
                         </li>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    {% if user.is_authenticated %}
+                    {% comment %} {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Welcome, {{ user.name|default:user.username }}
@@ -78,7 +78,7 @@
                         <li class="nav-item">
                             <a class="nav-link {% if 'register' in request.path %}active{% endif %}" href="#">Register</a>
                         </li>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
                 </ul>
             </div>
         </div>

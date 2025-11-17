@@ -4,7 +4,13 @@
 
 <body>
 
-    {% extends '../products/index.html'%}
+{% extends '../products/index.html' %}
+
+{% block content %}
+    <a href="{% url 'my_products' %}">My products</a>
+{% endblock %}
+
+
 
 </body>
 

@@ -1,5 +1,6 @@
 from django.db import models
 from Account.models import Account
+
 # Create your models here.
 class Product(models.Model):
     product_id = models.CharField(primary_key=True)

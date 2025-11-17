@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from .models import Account
 from uuid import uuid4
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import AbstractBaseUser
 
+import random
 # Create your views here.
 
 def accounts_list(request):
@@ -21,11 +24,11 @@ def accounts_list(request):
             raise ValueError("Missing data")
         
         new_account = Account(
-            user_id=uuid4(), 
-            names=names, 
+            user_id=random.randint(111111,999999), 
+            names=names,
             email=email, 
             phone=phone, 
-            password=password, 
+            password=make_password(password), 
             user_type=role
             )
         new_account.save()
@@ -49,29 +52,20 @@ def accounts_list(request):
 
 def user_login(request):
     if request.method == "POST":
-
         email = request.POST.get("user_email")
         password = request.POST.get("user_password")
-        try:
-            user = Account.objects.get(email=email) 
-            user_password = user.password
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
+
+        user = authenticate(request, email=email, password=password)
+
+        if user:
             login(request, user)
-            
-            if user_password == password:
-                if user.user_type == 'customer':
-                    return redirect('customer-dashboard')
-                elif user.user_type == 'vendor':
-                    return redirect('vendor-dashboard')
-            else:
-                raise ValueError("Invalid email or password")
-        except:
-            raise ValueError("Invalid email or password")
-        
-    elif request.method == "GET":
-        return render(request, 'account/login.html')
-    else:
-        return render(request, 'account/login.html')
+            redirect_url = 'customer-dashboard' if user.user_type == 'customer' else 'vendor-dashboard'
+            return redirect(redirect_url)
+
+        raise ValueError("Invalid email or password")
+
+    return render(request, 'account/login.html')
+
 
 def vendor_dashboard(request):
     return render(request, 'account/vendor_page.html')
