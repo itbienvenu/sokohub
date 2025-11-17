@@ -1,14 +1,19 @@
-
-
 <html>
-
-<body>
-
-    {% for product in products %}
-        <h1>Name: {{ product.name }}</h1>
-        <p>Description: {{ product.description }}</p>
-        <p>Price: {{ product.price }}</p>
-    {% endfor %}
-
-</body>
+    <body>
+        <h2>Products</h2>
+        <form method="POST" action="{% url 'add_order_item' %}">
+            {% csrf_token %}
+        {%for product in products%}
+        <div>
+            <h2>Name:</h2>{{ product.name }}
+            <p>Description: </p>{{ product.description }}
+            <p>Price: </p> {{ product.price }}
+            Order id: <input type="text" name="order_id" placeholder="Order Id" /> <br>
+            Quantity: <input type="number" min="1" value="product_quantity" />
+            <input type="hidden" value="{{product.product_id}}" />
+            <button type="submit">Add To Order</button>
+        </div>
+        {% endfor %}
+    </form>
+    </body>
 </html>

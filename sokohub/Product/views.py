@@ -35,6 +35,13 @@ def create_product(request):
         new_product.save()
         return redirect('vendor-dashboard')
 
+def get_all_products(request):
+    products = Product.objects.all()
+    context = {
+        "products":products
+    }
+    return render(request, 'products/products.html', context)
+
 
 
 def get_my_products(request):
@@ -47,5 +54,5 @@ def get_my_products(request):
         "products":vendor_products
     }
 
-    return render(request, 'products/products.html', context)
+    return render(request, 'products/my_products.html', context)
 

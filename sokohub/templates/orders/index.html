@@ -1,0 +1,12 @@
+<html>
+    <body>
+        <form method="POST" action="{% url 'create_order' %}">
+            {% csrf_token %}
+            <label>Phone:</label>
+            <input type="text" name="order_phone" placeholder="Order PHone" />
+            <label>Delivery Address:</label>
+            <input type="text" name="order_delivery_address" placeholder="Order address" />
+            <button type="submit">Initiate Payment</button>
+        </form>
+    </body>
+</html>
