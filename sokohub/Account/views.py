@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from .models import Account
 from uuid import uuid4
 from django.contrib.auth import authenticate, login
@@ -21,10 +22,11 @@ def accounts_list(request):
         role = request.POST.get('user_role')
 
         if not names or not email or not phone or not password or not role:
-            raise ValueError("Missing data")
+            messages.error(request, "All Fields are required")
         
-        if len(password) <=8:
-            raise ValueError("Password must be atleat 8 characters")
+        if len(password) < 8:
+            messages.error(request, "Password must be at least 8 characters long.")
+            return redirect('account_create')
         
         new_account = Account(
             user_id=random.randint(111111,999999), 
@@ -36,10 +38,12 @@ def accounts_list(request):
             )
         new_account.save()
 
+
         context = {
             'message':"Account created well"
         }
 
+        messages.success(request, context['message'])
         return redirect('user-login')
 
 

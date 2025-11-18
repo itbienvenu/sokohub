@@ -4,7 +4,7 @@ from .views import accounts_list, user_login, vendor_dashboard, customer_dashboa
 
 
 urlpatterns = [
-    path('', accounts_list, name='account-list'),
+    path('', accounts_list, name='account_create'),
     path('login/', user_login, name='user-login' ),
     path('vendor-dashboard/', vendor_dashboard, name='vendor-dashboard'),
     path('customer-dashboard/', customer_dashboard, name='customer-dashboard'),
