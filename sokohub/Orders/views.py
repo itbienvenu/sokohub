@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Order, OrderItem
+from Product.models import Product
 from django.contrib.auth.decorators import login_required
 import random
 
@@ -33,20 +34,39 @@ def create_order(request):
     return render(request, 'orders/index.html')
 
 
+
+def list_my_orders(request):
+    user = request.user
+    my_all_orders = Order.objects.filter(customer_id=user)
+    context = {
+        "orders":my_all_orders
+    }
+    return render(request, 'orders/my_orders.html',context)
+
+
 @login_required
 def add_product_to_order(request):
     if request.method == "POST":
-        try:
-            order_id = request.POST.get('order_id')
-            product_id = request.POST.get('product_id')
-            quantity = request.POST.get('product_quantity')
+        order_id = request.POST.get('order_id')
+        product_id = request.POST.get('product_id')
+        quantity = request.POST.get('product_quantity')
 
-            create_order_item = OrderItem(
-                order_id = order_id,
-                product_id = product_id,
-                quantity = quantity
-            )
+        if not order_id:
+            raise ValueError("order_id was not provided in the POST request")
 
-            create_order_item.save()
-        except Exception as e:
-            raise ValueError("Error creating the order itme", e)
+        order = Order.objects.get(pk=order_id)
+        product = Product.objects.get(pk=product_id)
+
+        OrderItem.objects.create(
+            order_id=order,
+            product_id=product,
+            quantity=quantity
+        )
+        context = {
+            "message":"Product is created"
+        }
+        return redirect("all_products")
+
+
+def list_order_items(request):
+    pass

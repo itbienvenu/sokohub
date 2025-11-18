@@ -23,6 +23,9 @@ def accounts_list(request):
         if not names or not email or not phone or not password or not role:
             raise ValueError("Missing data")
         
+        if len(password) <=8:
+            raise ValueError("Password must be atleat 8 characters")
+        
         new_account = Account(
             user_id=random.randint(111111,999999), 
             names=names,
