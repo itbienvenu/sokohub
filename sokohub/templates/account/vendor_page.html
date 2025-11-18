@@ -1,17 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Product - Vendor Dashboard</title>
 
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
 
-<html>
+  <body>
+    <!-- ========================= NAVBAR ========================= -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'vendor_dashboard' %}">
+          <i class="fas fa-store me-2"></i>Soko Hub - Vendor
+        </a>
 
-<body>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-{% extends '../products/index.html' %}
+        <div id="navMenu" class="collapse navbar-collapse">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'vendor_dashboard' %}">
+                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'vendor_products' %}">
+                <i class="fas fa-box me-1"></i>My Products
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'vendor_orders' %}">
+                <i class="fas fa-shopping-bag me-1"></i>Orders
+              </a>
+            </li>
+          </ul>
 
-{% block content %}
-    <a href="{% url 'my_products' %}">My products</a>
-{% endblock %}
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">
+                <i class="fas fa-user me-1"></i>Profile
+              </a>
+            </li>
+            <li class="nav-item">
+              <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                  <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
+    <!-- ========================= CONTENT SECTION ========================= -->
+    <div class="container mt-4">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'vendor_dashboard' %}">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{% url 'vendor_products' %}">My Products</a>
+          </li>
+          <li class="breadcrumb-item active">Add Product</li>
+        </ol>
+      </nav>
 
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h4 class="mb-0">
+                <i class="fas fa-plus-circle me-2"></i>Add New Product
+              </h4>
+            </div>
+            <div class="card-body">
+              <form
+                method="POST"
+                action="{% url 'add_product' %}"
+                enctype="multipart/form-data"
+              >
+                {% csrf_token %}
 
-</body>
+                <!-- Product Name -->
+                <div class="mb-3">
+                  <label class="form-label">Product Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    class="form-control"
+                    placeholder="Enter product name"
+                    required
+                  />
+                  <div class="form-text">
+                    Give your product a clear and descriptive name.
+                  </div>
+                </div>
 
+                <!-- Description -->
+                <div class="mb-3">
+                  <label class="form-label">Description</label>
+                  <textarea
+                    name="description"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Describe your product features, specifications, etc."
+                  ></textarea>
+                  <div class="form-text">
+                    Detailed descriptions help customers make informed
+                    decisions.
+                  </div>
+                </div>
+
+                <!-- Price and Stock -->
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Price ($) *</label>
+                    <input
+                      type="number"
+                      name="price"
+                      class="form-control"
+                      step="0.01"
+                      min="0.01"
+                      placeholder="0.00"
+                      required
+                    />
+                    <div class="form-text">Set your product price.</div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Stock Quantity *</label>
+                    <input
+                      type="number"
+                      name="stock"
+                      class="form-control"
+                      min="0"
+                      placeholder="0"
+                      required
+                    />
+                    <div class="form-text">Available quantity in stock.</div>
+                  </div>
+                </div>
+
+                <!-- Remove duplicate quantity field (you had both stock and quantity) -->
+
+                <!-- Product Image -->
+                <div class="mb-4">
+                  <label class="form-label">Product Image</label>
+                  <input
+                    type="file"
+                    name="image"
+                    class="form-control"
+                    accept="image/*"
+                  />
+                  <div class="form-text">
+                    Upload a clear image of your product (JPEG, PNG, JPG).
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                  <a
+                    href="{% url 'vendor_products' %}"
+                    class="btn btn-secondary me-md-2"
+                  >
+                    <i class="fas fa-times me-1"></i>Cancel
+                  </a>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Add Product
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Help Section -->
+          <div class="card mt-4">
+            <div class="card-body">
+              <h5>
+                <i class="fas fa-lightbulb me-2"></i>Tips for Adding Products
+              </h5>
+              <ul class="mb-0">
+                <li>Use clear, descriptive product names</li>
+                <li>Provide detailed descriptions with key features</li>
+                <li>Set competitive prices based on market research</li>
+                <li>Upload high-quality product images</li>
+                <li>Keep stock quantities updated regularly</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      .card {
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        border: 1px solid #e3e6f0;
+      }
+      .card-header {
+        border-bottom: 1px solid #e3e6f0;
+      }
+      .breadcrumb {
+        background-color: #f8f9fc;
+        border-radius: 0.35rem;
+      }
+    </style>
+  </body>
 </html>
