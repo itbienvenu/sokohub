@@ -1,0 +1,53 @@
+{% extends 'account/vendor/vendor_nav.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">My Products</h2>
+
+    {% if products %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+
+            {% for product in products %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+
+                    {% if product.image %}
+                        <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x200?text=No+Image"
+                             class="card-img-top" alt="No Image">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ product.name }}</h5>
+
+                        <p class="card-text text-muted" style="min-height: 60px;">
+                            Description: {{ product.description|slice:":120" }}...
+                        </p>
+
+                        <p class="fw-bold">Price: {{ product.price }} RWF</p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                        <a 
+                        {% comment %} href="{% url 'edit_product' product.id %}"  {% endcomment %}
+                        class="btn btn-primary btn-sm">Edit</a>
+                        <a 
+                        {% comment %} href="{% url 'delete_product' product.id %}"  {% endcomment %}
+                        class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <p class="text-muted">You have not added any products yet.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

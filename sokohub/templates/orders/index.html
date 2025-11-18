@@ -1,13 +1,14 @@
-<html>
-    <body>
-        <form method="POST" action="{% url 'create_order' %}">
-            {% csrf_token %}
-            <label>Phone:</label>
-            <input type="text" name="order_phone" placeholder="Order PHone" />
-            <label>Delivery Address:</label>
-            <input type="text" name="order_delivery_address" placeholder="Order address" />
-            <button type="submit">Initiate Payment</button>
-        </form>
-        <a href="{% url 'my_orders' %}">My orders</a>
-    </body>
-</html>
+{% extends '../products/navbar.html' %}
+
+{% block content %}
+<form method="POST" action="{% url 'create_order' %}">
+    {% csrf_token %}
+    <label>Order name:</label>
+    <input type="text" name="order_phone" placeholder="Order Phone">
+    <label>Delivery Address:</label>
+    <input type="text" name="order_delivery_address" placeholder="Order address">
+    <button type="submit">Initiate Order</button>
+</form>
+
+<a href="{% url 'my_orders' %}">My orders</a>
+{% endblock content %}

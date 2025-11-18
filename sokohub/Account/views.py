@@ -75,7 +75,7 @@ def user_login(request):
 
 
 def vendor_dashboard(request):
-    return render(request, 'account/vendor_page.html')
+    return render(request, 'account/vendor/vendor_page.html')
 
 def customer_dashboard(request):
-    return render(request, 'account/customer_page.html')
+    return render(request, 'account/customer/customer_page.html')

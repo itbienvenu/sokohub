@@ -23,8 +23,8 @@ def create_order(request):
 
             create_order = Order (
                 total = 0,
-                delivery_address = "delivery_address",
-                phone = "phone",
+                delivery_address = delivery_address,
+                phone = phone,
                 customer_id = request.user
             )
 
@@ -37,11 +37,14 @@ def create_order(request):
 
 def list_my_orders(request):
     user = request.user
-    my_all_orders = Order.objects.filter(customer_id=user)
+    
+    # Filter using the Foreign Key ID field (e.g., 'customer_id') and pass the PK
+    my_all_orders = Order.objects.filter(customer_id=user.pk) 
+    
     context = {
-        "orders":my_all_orders
+        "orders": my_all_orders
     }
-    return render(request, 'orders/my_orders.html',context)
+    return render(request, 'orders/my_orders.html', context)
 
 
 @login_required

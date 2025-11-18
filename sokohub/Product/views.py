@@ -3,6 +3,8 @@ from .models import Product
 from Account.models import Account
 from django.contrib.auth.decorators import login_required
 from uuid import uuid4
+from django.contrib import messages
+
 # Create your views here.
 
 
@@ -33,6 +35,7 @@ def create_product(request):
             )
         
         new_product.save()
+        messages.success(request, "Product created well")
         return redirect('vendor-dashboard')
 
 def get_all_products(request):
@@ -49,10 +52,9 @@ def get_my_products(request):
     # go in databse and fetch prodcts for loged in vendor
 
     vendor_products = Product.objects.filter(user=vendor)
-
     context = {
         "products":vendor_products
     }
 
-    return render(request, 'products/my_products.html', context)
+    return render(request, 'products/vendor/my_products.html', context)
 
