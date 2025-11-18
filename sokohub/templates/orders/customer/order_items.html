@@ -1,0 +1,42 @@
+{% extends '../../products/customer/navbar.html' %}
+{% comment %} {% load math_filters %} {% endcomment %}
+
+{% block title %}Order Items - #{{ order.order_id }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Items for Order #{{ order.order_id }}</h2>
+    
+    <a href="{% url 'my_orders' %}" class="btn btn-outline-secondary btn-sm mb-3">
+        &larr; Back to My Orders
+    </a>
+
+    {% if items %}
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.product_id.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>Ksh {{ item.product_id.price }}</td>
+                        <td>Ksh {{ item.quantity}} </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-end fw-bold fs-5 mt-4">
+            Total Order Value: Ksh {{ order.total }}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">No items found for this order.</div>
+    {% endif %}
+</div>
+{% endblock content %}

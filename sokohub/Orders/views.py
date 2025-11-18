@@ -3,6 +3,7 @@ from .models import Order, OrderItem
 from Product.models import Product
 from django.contrib.auth.decorators import login_required
 import random
+from django.contrib import messages
 
 from django.contrib import messages
 # Create your views here.
@@ -38,14 +39,15 @@ def create_order(request):
 def list_my_orders(request):
     user = request.user
     
-    # Filter using the Foreign Key ID field (e.g., 'customer_id') and pass the PK
-    my_all_orders = Order.objects.filter(customer_id=user.pk) 
+    my_all_orders = Order.objects.filter(customer_id=user.pk).prefetch_related(
+        'orderitem_set',
+        'orderitem_set__product_id'
+    ) 
     
     context = {
         "orders": my_all_orders
     }
     return render(request, 'orders/customer/my_orders.html', context)
-
 
 @login_required
 def add_product_to_order(request):
@@ -72,7 +74,7 @@ def add_product_to_order(request):
 
 
 @login_required
-def list_order_items(request):
+def vendor_order_items(request):
     vendor = request.user
 
     # 1. Authorization check
@@ -88,3 +90,27 @@ def list_order_items(request):
     }
 
     return render(request, 'orders/vendor_order_items.html', context)
+
+
+# customr get order items
+
+@login_required
+def get_order_items(request):
+    order_id = request.GET.get('order_id')
+
+    if not order_id:
+
+        messages.error(request, "Invalid Ordere id")
+        return redirect('')
+
+    select_items = OrderItem.objects.filter(
+        order_id=order_id,
+        order_id__customer_id=request.user 
+    ).select_related('product_id')
+
+    context = {
+        'select_items': select_items,
+        'order_id': order_id
+    }
+
+    return render(request, 'orders/customer/order_items.html', context)
