@@ -44,7 +44,7 @@ def list_my_orders(request):
     context = {
         "orders": my_all_orders
     }
-    return render(request, 'orders/my_orders.html', context)
+    return render(request, 'orders/customer/my_orders.html', context)
 
 
 @login_required
@@ -71,5 +71,20 @@ def add_product_to_order(request):
         return redirect("all_products")
 
 
+@login_required
 def list_order_items(request):
-    pass
+    vendor = request.user
+
+    # 1. Authorization check
+    if not vendor.user_type == 'vendor':
+        return redirect('all_products') 
+
+    vendor_order_items = OrderItem.objects.filter(
+        product_id__user=vendor 
+    ).select_related('order_id', 'product_id')
+
+    context = {
+        "order_items": vendor_order_items
+    }
+
+    return render(request, 'orders/vendor_order_items.html', context)

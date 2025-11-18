@@ -1,0 +1,52 @@
+{% extends 'account/vendor/vendor_nav.html' %}
+{% comment %} {% load math_filters %}  Assuming you created the math_filters custom tag {% endcomment %}
+
+{% block title %}Vendor Orders{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Orders for Your Products</h2>
+
+    {% if order_items %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product Name</th>
+                        <th>Customer Phone</th>
+                        <th>Quantity</th>
+                        <th>Price per Unit</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                        <tr>
+                            <td>
+                                <a href="#">{{ item.order_id.order_id }}</a>
+                            </td>
+                            <td>
+                                <strong>{{ item.product_id.name }}</strong>
+                            </td>
+                            <td>
+                                {{ item.order_id.phone }}
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>Ksh {{ item.product_id.price }}</td>
+                            <td>
+                                <strong>Ksh {{ item.quantity }}</strong>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">No Orders Found!</h4>
+            <p>You currently have no order items linked to your products.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}
