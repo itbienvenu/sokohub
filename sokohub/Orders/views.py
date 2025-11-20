@@ -105,7 +105,7 @@ def get_order_items(request):
 
     if not order_id:
 
-        messages.error(request, "Invalid Ordere id")
+        messages.error(request, "Invalid Order id")
         return redirect('')
 
     select_items = OrderItem.objects.filter(
@@ -114,7 +114,7 @@ def get_order_items(request):
     ).select_related('product_id')
 
     context = {
-        'select_items': select_items,
+        'items': select_items,
         'order_id': order_id
     }
 

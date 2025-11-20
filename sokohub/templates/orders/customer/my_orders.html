@@ -20,17 +20,11 @@
                             <strong>Total: {{ order.total }} RWF</strong>
                         </div>
 
-                        <button class="btn btn-primary btn-sm"
-                                type="button" 
-                                data-bs-toggle="collapse"
-                                data-bs-target="#items{{ order.order_id }}" 
-                                aria-expanded="false" 
-                                aria-controls="items{{ order.order_id }}">
                             <a href="{% url 'order_items' %}?order_id={{ order.order_id }}" 
                        class="btn btn-primary btn-sm">
                         View Items
                     </a>
-                        </button>
+ 
                     </div>
 
                 </div>
