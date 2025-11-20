@@ -41,11 +41,11 @@
                             <p class="card-text text-muted">{{ product.description|truncatechars:100 }}</p>
                             <p class="card-text fw-bold text-success">Ksh {{ product.price }}</p>
                             
-                            <form method="POST" action="{% url 'add_order_item' %}" class="mt-auto">
-                                {% csrf_token %}
+                            <div class="mt-auto">
+                                 <div class="mb-2">
+                                    <label for="order-id-{{ product.product_id }}" class="form-label visually-hidden">Vendor Names: </label>
+                               Vendor: <p class="card-text fw-bold text-success"> {{ product.user.names }}</p>
 
-                                <div class="mb-2">
-                                    <label for="order-id-{{ product.product_id }}" class="form-label visually-hidden">Order ID</label>
                                     <input type="text" class="form-control form-control-sm" name="order_id" id="order-id-{{ product.product_id }}" placeholder="Current Order ID" required>
                                 </div>
                                 
@@ -59,16 +59,12 @@
                                         <input type="number" class="form-control form-control-sm" name="product_quantity" id="quantity-{{ product.product_id }}" min="1" value="1" required>
                                     </div>
                                     <div class="col">
-                                        <button type="submit" class="btn btn-primary btn-sm w-100">Add To Order</button>
+                                    <a class='btn btn-primary btn-sm w-50' href="{% url 'product_details' %}?product_id={{product.product_id}}">View Details</a>
                                     </div>
                                     
                                 </div>
-                            </form>
-                            <div class="row mt-5">
-                                <button type="submit" class="btn btn-secondary btn-sm w-100">
-                                    <a href="{% url 'product_details' %}?product_id={{product.product_id}}">View Details</a>
-                                </button>
                             </div>
+
                         </div>
                     </div>
                 </div>

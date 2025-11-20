@@ -4,6 +4,7 @@ from Product.models import Product
 from django.contrib.auth.decorators import login_required
 import random
 from django.contrib import messages
+from django.http import JsonResponse
 
 from django.contrib import messages
 # Create your views here.
@@ -35,6 +36,7 @@ def create_order(request):
     if user.user_type != 'customer':
         messages.error(request, "Only customers are one to access Orders section")
         return redirect('all_products')
+    return redirect('my_orders')
     
 
 
@@ -117,3 +119,28 @@ def get_order_items(request):
     }
 
     return render(request, 'orders/customer/order_items.html', context)
+
+
+
+@login_required
+def get_user_active_orders_json(request):
+    """
+    Fetches the user's active orders (pending/processing) and returns them as JSON.
+    """
+    user = request.user
+    
+    active_orders = Order.objects.filter(
+        customer_id=user.pk,
+        status__in=['pending', 'processing'] 
+    ).order_by('-created_at')
+    print(user)
+    order_list = []
+    for order in active_orders:
+        order_list.append({
+            'order_id': order.order_id, 
+            'display_name': f"Order #{order.order_id} ({order.status.capitalize()})",
+            'created_at': order.created_at.strftime("%Y-%m-%d"),
+            'status': order.status,
+        })
+
+    return JsonResponse({'orders': order_list})

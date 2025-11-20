@@ -1,10 +1,153 @@
-<html>
+{% extends './navbar.html' %}
+{% load static %}  {# Add this line if you plan to move the JS to a static file later #}
 
-<body>
-    <div>
-        {%if product%}
-        Name: {{product.name}}
-        {% endif %}
+{% block title %}{{ product.name }} Details{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    {% if product %}
+    <div class="row">
+        
+        <div class="col-md-5">
+            <div class="card shadow-lg border-0">
+                <img src="{{ product.image }}" 
+                     class="card-img-top rounded-top" 
+                     alt="{{ product.name }}" 
+                     style="height: 450px; object-fit: cover;">
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    
+                    <h1 class="card-title display-5">{{ product.name }}</h1>
+                    <p class="text-success display-6 fw-bold">RWF {{ product.price }}</p>
+                    
+                    <hr>
+
+                    <div class="mb-4">
+                        <span class="badge bg-secondary me-2">Vendor</span>
+                        <span class="fs-5 fw-medium">{{ vendor_name }}</span>
+                    </div>
+
+                    {# ... (Description, Quantity, Status blocks) ... #}
+                    <div class="mb-4">
+                        <h5 class="fw-bold">Description</h5>
+                        <p class="text-muted">{{ product.description }}</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">Available Quantity</h5>
+                            <p class="fs-4">{{ product.quantity }} units</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="fw-bold">Status</h5>
+                            {% if product.status %}
+                                <span class="badge bg-success fs-5">In Stock</span>
+                            {% else %}
+                                <span class="badge bg-danger fs-5">Out of Stock</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <h5 class="mb-3">Add to Order</h5>
+                        <form action="{% url 'add_order_item' %}" method="POST" class="d-grid gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.product_id }}">
+
+                            <div class="mb-3">
+                                <label for="order_select" class="form-label fw-bold">Choose Active Order:</label>
+                                <select class="form-select" id="order_select" name="order_id" required disabled>
+                                    <option value="">Loading active orders...</option>
+                                </select>
+                            </div>
+
+                            <input type="number" 
+                                   class="form-control" 
+                                   name="product_quantity" 
+                                   placeholder="Enter quantity"
+                                   min="1"
+                                   value="1"
+                                   required />
+
+                            <button type="submit" id="add-to-order-btn" class="btn btn-primary mt-2" disabled>
+                                <i class="fas fa-cart-plus me-1"></i> Add to Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Product details are not available.
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+$(document).ready(function() {
+    console.log("AJAX script loaded");
+
+    const orderSelect = $('#order_select');
+    const submitBtn = $('#add-to-order-btn');
+    const orderApiUrl = "{% url 'get_active_orders_json' %}"; 
+    
+
+    function fetchAndPopulateOrders() {
+        $.ajax({
+            url: orderApiUrl,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                const orders = response.orders;
+                orderSelect.empty();
+                orderSelect.prop('disabled', false);
+                submitBtn.prop('disabled', false);
+
+                if (orders.length === 0) {
+                    orderSelect.append('<option value="" disabled selected>No Active Orders. Start a new one!</option>');
+                    orderSelect.prop('disabled', true);
+                    submitBtn.prop('disabled', true);
+                    orderSelect.addClass('is-invalid');
+                } else {
+                    orderSelect.removeClass('is-invalid');
+                    orderSelect.append('<option value="" disabled selected>Select an Order</option>');
+                    
+                    // Loop through the orders received from the JSON view
+                    $.each(orders, function(index, order) {
+                        orderSelect.append(
+                            `<option value="${order.order_id}">Order #${order.order_id} (${order.status.capitalize()})</option>`
+                        );
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error loading orders:", error);
+                orderSelect.empty();
+                orderSelect.append('<option value="" disabled selected>Error loading orders.</option>');
+                orderSelect.prop('disabled', true);
+                submitBtn.prop('disabled', true);
+            }
+        });
+    }
+
+    fetchAndPopulateOrders();
+});
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}
+</script>
+{% endblock scripts %}

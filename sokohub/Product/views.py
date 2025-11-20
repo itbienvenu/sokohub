@@ -40,12 +40,12 @@ def create_product(request):
     
 
 def get_all_products(request):
-    products = Product.objects.all()
+    products = Product.objects.all().select_related('user')
+    
     context = {
-        "products":products
+        "products": products
     }
     return render(request, 'products/customer/products.html', context)
-
 
 
 def get_my_products(request):
@@ -150,9 +150,11 @@ def product_details(request):
         pk=product_id
     )
     
-
+    vendor_name = product.user.names 
+    
     context = {
-        "product": product
+        "product": product,
+        "vendor_name": vendor_name, 
     }
     
     return render(request, 'products/customer/product_details.html', context)
