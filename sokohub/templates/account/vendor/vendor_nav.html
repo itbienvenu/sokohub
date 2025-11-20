@@ -75,13 +75,13 @@
       <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="#">Dashboard</a>
+            <a href="{% url 'vendor-dashboard'%}">Dashboard</a>
           </li>
           <li class="breadcrumb-item">
             <a href="{% url 'vendor_products' %}">My Products</a>
           </li>
           <li class="breadcrumb-item active">
-            <a href="{% url 'vendor-dashboard' %}">Add Product </a>
+            <a href="{% url 'vendor_add_products' %}">Add Product </a>
           </li>
         </ol>
       </nav>

@@ -66,7 +66,7 @@ def user_login(request):
 
         if user:
             login(request, user)
-            redirect_url = 'customer-dashboard' if user.user_type == 'customer' else 'vendor-dashboard'
+            redirect_url = 'all_products' if user.user_type == 'customer' else 'vendor-dashboard'
             return redirect(redirect_url)
 
         raise ValueError("Invalid email or password")

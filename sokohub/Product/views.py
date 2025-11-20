@@ -58,3 +58,5 @@ def get_my_products(request):
 
     return render(request, 'products/vendor/my_products.html', context)
 
+def vendor_add_products(request):
+    return render(request, 'account/vendor/vendor_add_products.html')
