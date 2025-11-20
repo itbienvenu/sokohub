@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product
 from Account.models import Account
 from django.contrib.auth.decorators import login_required
@@ -60,3 +60,81 @@ def get_my_products(request):
 
 def vendor_add_products(request):
     return render(request, 'account/vendor/vendor_add_products.html')
+
+@login_required
+def edit_product(request):
+    if request.method == "GET":
+        product_id = request.GET.get('product_id')
+
+        try:
+            product = get_object_or_404(
+                Product, 
+                pk=product_id, 
+                user=request.user
+            )
+        except:
+            messages.error(request, "Product not found or you do not have permission to edit it.")
+            return redirect("vendor_products")
+        
+        context = {
+            "product": product
+        }
+        return render(request, 'products/vendor/edit_product.html', context)
+    
+    elif request.method == "POST":
+
+        p_id = request.POST.get('product_id')
+        
+        try:
+            product = Product.objects.get(pk=p_id, user=request.user)
+        except Product.DoesNotExist:
+            messages.error(request, "Product not found or unauthorized update attempted.")
+            return redirect("vendor_products")
+
+
+        product.name = request.POST.get('product_name')
+        product.description = request.POST.get('product_description')
+
+        try:
+            product.stock = int(request.POST.get('product_stock'))
+            product.price = float(request.POST.get('product_price'))
+            product.quantity = int(request.POST.get('product_quantity'))
+        except (ValueError, TypeError):
+            messages.error(request, "Stock, Price, and Quantity must be valid numbers.")
+            return redirect('edit_product', product_id=p_id)
+        product.save()
+
+        messages.success(request, f"Product '{product.name}' updated successfully!")
+        return redirect("vendor_products")
+    
+    return redirect("vendor_products")
+
+
+@login_required
+def delete_product(request):
+
+    product_id = request.POST.get('product_id') or request.GET.get('product_id')
+    
+    if not product_id:
+        messages.error(request, "Product ID is missing.")
+        return redirect("vendor_products") 
+    try:
+
+        product = get_object_or_404(
+            Product, 
+            pk=product_id, 
+            user=request.user 
+        )
+    except Exception:
+        messages.error(request, "Product not found or unauthorized deletion attempted.")
+        return redirect("vendor_products")
+
+    if request.method == "POST":
+        product_name = product.name
+
+        product.delete() 
+
+        messages.success(request, f"Product '{product_name}' has been successfully deleted.")
+        return redirect("vendor_products")
+    messages.warning(request, "Deletion requires confirmation.")
+    return redirect("vendor_products")

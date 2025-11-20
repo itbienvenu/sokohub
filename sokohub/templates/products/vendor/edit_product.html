@@ -1,0 +1,124 @@
+{% extends 'account/vendor/vendor_nav.html' %}
+
+{% block title %}Edit Product: {{ product.name }}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Edit Product Details</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if product %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            
+            <form method="POST" action="{% url 'edit_product' %}">
+                {% csrf_token %}
+                
+                <input type="hidden" value="{{ product.product_id }}" name="product_id" />
+
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Current Image</label>
+                            <img src="{{ product.image }}" 
+                                 class="img-fluid border rounded mb-2" 
+                                 alt="{{ product.name }}" 
+                                 style="max-height: 200px; object-fit: cover;" />
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        
+                        <div class="mb-3">
+                            <label for="product_name" class="form-label">Name:</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="product_name" 
+                                   value="{{ product.name }}" 
+                                   name="product_name" 
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="product_price" class="form-label">Price (RWF):</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="product_price" 
+                                   value="{{ product.price }}" 
+                                   name="product_price" 
+                                   step="0.01" 
+                                   required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="product_quantity" class="form-label">Total Quantity:</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="product_quantity" 
+                                       value="{{ product.quantity }}" 
+                                       name="product_quantity" 
+                                       required />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="product_stock" class="form-label">Current Stock:</label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="product_stock" 
+                                       value="{{ product.stock }}" 
+                                       name="product_stock" 
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="product_status" class="form-label">Status:</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="product_status" 
+                                   value="{{ product.status }}" 
+                                   name="product_status" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="product_image" class="form-label">Image URL:</label>
+                            <input type="url" 
+                                   class="form-control" 
+                                   id="product_image" 
+                                   value="{{ product.image }}" 
+                                   name="product_image" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="product_description" class="form-label">Description:</label>
+                            <textarea class="form-control" 
+                                      id="product_description" 
+                                      name="product_description" 
+                                      rows="4">{{ product.description }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-end pt-3">
+                            <button type="submit" class="btn btn-success me-2">Update Product</button>
+                            <a href="{% url 'vendor_products' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    {% else %}
+        <div class="alert alert-danger">Error: Product data not available.</div>
+    {% endif %}
+    
+    <h1 class="mt-5 text-muted">This the edit product page btw hahahah</h1>
+</div>
+{% endblock %}
