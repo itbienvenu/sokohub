@@ -61,8 +61,14 @@
                                     <div class="col">
                                         <button type="submit" class="btn btn-primary btn-sm w-100">Add To Order</button>
                                     </div>
+                                    
                                 </div>
                             </form>
+                            <div class="row mt-5">
+                                <button type="submit" class="btn btn-secondary btn-sm w-100">
+                                    <a href="{% url 'product_details' %}?product_id={{product.product_id}}">View Details</a>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

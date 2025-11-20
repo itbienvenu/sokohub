@@ -37,6 +37,7 @@ def create_product(request):
         new_product.save()
         messages.success(request, "Product created well")
         return redirect('vendor-dashboard')
+    
 
 def get_all_products(request):
     products = Product.objects.all()
@@ -94,6 +95,7 @@ def edit_product(request):
 
         product.name = request.POST.get('product_name')
         product.description = request.POST.get('product_description')
+        product.image = request.POST.get('product_image')
 
         try:
             product.stock = int(request.POST.get('product_stock'))
@@ -138,3 +140,19 @@ def delete_product(request):
         return redirect("vendor_products")
     messages.warning(request, "Deletion requires confirmation.")
     return redirect("vendor_products")
+
+
+def product_details(request):
+    product_id = request.GET.get('product_id')
+
+    product = get_object_or_404(
+        Product, 
+        pk=product_id
+    )
+    
+
+    context = {
+        "product": product
+    }
+    
+    return render(request, 'products/customer/product_details.html', context)

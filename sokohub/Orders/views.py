@@ -7,15 +7,15 @@ from django.contrib import messages
 
 from django.contrib import messages
 # Create your views here.
+
 @login_required
 def create_order(request):
-
+    user = request.user
     if request.method == "POST":
-        user = request.user
         try:
             if user.user_type != 'customer':
                 messages.error(request, "Invalid user type")
-                return redirect('create_order')
+                return redirect('all_products')
             
             total = request.POST.get("order_total")
             delivery_address = request.POST.get("order_delivery_address")
@@ -31,11 +31,14 @@ def create_order(request):
 
             create_order.save()
         except Exception as e:
-            raise ValueError("Error creating order", e, "Reques user: ", request.user.user_id)   
-    return render(request, 'orders/index.html')
+            raise ValueError("Error creating order", e, "Reques user: ", request.user.user_id)  
+    if user.user_type != 'customer':
+        messages.error(request, "Only customers are one to access Orders section")
+        return redirect('all_products')
+    
 
 
-
+@login_required
 def list_my_orders(request):
     user = request.user
     
