@@ -158,3 +158,6 @@ def product_details(request):
     }
     
     return render(request, 'products/customer/product_details.html', context)
+
+def landing_page(request):
+    return render(request, 'landing_page.html')

@@ -1,12 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from Product.views import get_all_products
+from Product.views import get_all_products, landing_page
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('Account.urls')),
     path('products/', include('Product.urls')),
-    path('', get_all_products, name="all_products"),
+    path('', landing_page, name="landing_page"),
     path("orders/", include('Orders.urls'))
 ]
 
