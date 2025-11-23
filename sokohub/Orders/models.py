@@ -12,7 +12,15 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('pending','Pending'),
         ('delivered','Delivered'),
-        ('cancelled','Cancelled')
+        ('cancelled','Cancelled'),
+        ('processing','Processing'),
+        ('shipped','Shipped'),
+        ('returned','Returned'),
+        ('failed','Failed'),
+        ('refunded','Refunded'),
+        ('on_hold','On Hold'),
+        ('partially_refunded','Partially Refunded'),
+        ('partially_shipped','Partially Shipped'),
     ]
 
     order_id = models.IntegerField(primary_key=True, null=False, default=generate_random_code)

@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 # Create your views here.
 
+# Customer creates an order
 @login_required
 def create_order(request):
     user = request.user
@@ -42,7 +43,7 @@ def create_order(request):
     return redirect('my_orders')
     
 
-
+# Customer views his/her orders
 @login_required
 def list_my_orders(request):
     user = request.user
@@ -57,6 +58,7 @@ def list_my_orders(request):
     }
     return render(request, 'orders/customer/my_orders.html', context)
 
+# Customer adds product to an order
 @login_required
 def add_product_to_order(request):
     if request.method == "POST":
@@ -81,6 +83,8 @@ def add_product_to_order(request):
         return redirect("all_products")
 
 
+
+# Vendor views order items related to his/her products
 @login_required
 def vendor_order_items(request):
     vendor = request.user
@@ -208,3 +212,81 @@ def update_order_item_quantity(request, item_id):
             messages.error(request, "Order item not found.")
     
     return redirect('my_orders')
+
+
+@login_required
+def vendor_order_items(request):
+    vendor = request.user
+    
+    # 1. Authorization check
+    if not vendor.user_type == 'vendor':
+        return redirect('all_products')
+
+    order_ids_related_to_vendor = OrderItem.objects.filter(
+        product_id__user=vendor
+    ).values_list('order_id', flat=True).distinct()
+    
+    vendor_orders = Order.objects.filter(
+        order_id__in=order_ids_related_to_vendor
+    ).select_related('customer_id').order_by('-created_at') # Order by newest first
+
+    context = {
+        "vendor_orders": vendor_orders
+    }
+    return render(request, 'orders/vendor_order_items.html', context)
+
+# vendor get order items
+
+@login_required
+def vendor_get_order_items(request, order_id):
+    vendor = request.user
+    
+    # 1. Authorization check
+    if not hasattr(vendor, 'user_type') or vendor.user_type != 'vendor':
+        return JsonResponse({'error': 'Unauthorized access.'}, status=403)
+
+    vendor_order_items_qs = OrderItem.objects.filter(
+        product_id__user=vendor,
+        order_id=order_id
+    ).select_related('order_id', 'product_id')
+
+    serialized_data = []
+    for item in vendor_order_items_qs:
+        product = item.product_id
+        
+        unit_price = float(product.price)
+        subtotal = item.quantity * unit_price
+        
+        serialized_data.append({
+            'item_id': item.item_id,
+            'order_id': item.order_id.order_id,
+            'quantity': item.quantity,
+            'product_id': product.product_id,
+            'product_name': product.name,
+            'unit_price': unit_price,
+            'subtotal': subtotal,
+        })
+        
+    return JsonResponse({'items': serialized_data})
+
+
+
+@login_required
+def vendor_order_update_order_status(request, order_id):
+    if request.method == "POST":
+        new_status = request.POST.get('status')
+        
+        vendor = request.user
+        if not vendor.user_type == 'vendor':
+            messages.error(request, "Unauthorized access.")
+            return redirect('all_products')
+
+        try:
+            order = Order.objects.get(order_id=order_id)
+            order.status = new_status
+            order.save()
+            messages.success(request, f"Order {order_id} status updated to {new_status}.")
+        except Order.DoesNotExist:
+            messages.error(request, "Order not found.")
+
+    return redirect('vendor-order-items')

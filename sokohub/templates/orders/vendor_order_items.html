@@ -1,5 +1,5 @@
 {% extends 'account/vendor/vendor_nav.html' %}
-{% comment %} {% load math_filters %}  Assuming you created the math_filters custom tag {% endcomment %}
+{% load math_filters %}
 
 {% block title %}Vendor Orders{% endblock title %}
 
@@ -7,37 +7,41 @@
 <div class="container mt-4">
     <h2 class="mb-4">Orders for Your Products</h2>
 
-    {% if order_items %}
+    {% comment %} Assuming the context variable is now 'vendor_orders' {% endcomment %}
+    {% if vendor_orders %}
         <div class="table-responsive">
             <table class="table table-hover table-striped">
                 <thead class="table-dark">
                     <tr>
                         <th>Order ID</th>
-                        <th>Product Name</th>
+                        <th>Status</th>
                         <th>Customer Phone</th>
-                        <th>Quantity</th>
-                        <th>Price per Unit</th>
-                        <th>Subtotal</th>
+                        <th>Date</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in order_items %}
+                    {% for order in vendor_orders %}
                         <tr>
                             <td>
-                                <a href="#">{{ item.order_id.order_id }}</a>
+                                {{ order.order_id }}
                             </td>
                             <td>
-                                <strong>{{ item.product_id.name }}</strong>
+                                <span class="badge bg-secondary">{{ order.status|capfirst }}</span>
                             </td>
                             <td>
-                                {{ item.order_id.phone }}
+                                {{ order.phone }}
                             </td>
-                            <td>{{ item.quantity }}</td>
-                            <td>Ksh {{ item.product_id.price }}</td>
                             <td>
-                                <strong>Ksh {{ item.quantity }}</strong>
+                                {{ order.created_at|date:"M d, Y" }}
                             </td>
-                        </tr>
+                            <td>
+                                <button class="btn btn-primary btn-sm" 
+                                        onclick="viewOrderItems('{{ order.order_id }}')">
+                                    View Items
+                                </button>
+                            </td>
+                        </tr> 
                     {% endfor %}
                 </tbody>
             </table>
@@ -49,4 +53,101 @@
         </div>
     {% endif %}
 </div>
+
+<div class="modal fade" id="orderItemsModal" tabindex="-1" aria-labelledby="orderItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderItemsModalLabel">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-content-container">
+                    <p>Click "View Items" to load item details.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ... (Your existing viewOrderItems function goes here) ...
+    console.log("Vendor Orders Page Loaded");
+    
+    function viewOrderItems(orderId) {
+        const modalTitle = $('#orderItemsModalLabel');
+        const modalBody = $('#modal-content-container');
+        
+        modalTitle.text(`Order Details for ID: ${orderId}`);
+        modalBody.html('<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+        
+        const orderItemsModal = new bootstrap.Modal(document.getElementById('orderItemsModal'));
+        orderItemsModal.show();
+
+
+        $.ajax({
+            url: "{% url 'vendor_get_order_items' 0 %}".replace('0', orderId), 
+            method: "GET",
+            success: function(data) {
+                let items = data.items;
+                let totalOrderSum = 0;
+                
+                let tableHtml = `
+                    <p class="mb-3">Items you supplied in Order #${orderId}:</p>
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                $.each(items, function(index, item) {
+                    let subtotal = item.quantity * item.unit_price;
+                    totalOrderSum += subtotal; 
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${item.product_name}</td>
+                            <td>${item.quantity}</td>
+                            <td>Ksh ${item.unit_price.toFixed(2)}</td>
+                            <td>Ksh ${subtotal.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Order Items Total:</td>
+                                <td class="fw-bold">Ksh ${totalOrderSum.toFixed(2)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+                
+                modalBody.html(tableHtml);
+
+            },
+            error: function(xhr, status, error) {
+                modalTitle.text(`Error for Order ID: ${orderId}`);
+                modalBody.html('<div class="alert alert-danger">Could not fetch order details. Please ensure the order ID is valid .</div>');
+            }
+        });
+    }
+
+</script>
+{% endblock scripts %}
