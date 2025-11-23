@@ -19,6 +19,7 @@
                     <th>Quantity</th>
                     <th>Unit Price</th>
                     <th>Subtotal</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,7 +28,20 @@
                         <td>{{ item.product_id.name }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>Ksh {{ item.product_id.price }}</td>
-                        <td>Ksh {{ item.quantity}} </td>
+                        <td>Ksh {{ item.quantity|multiply:item.product_id.price }} </td>
+                        <td>
+                            <form method="POST" action="{% url 'delete_order_item' item.item_id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                            <form method="POST" action="{% url 'update_order_item_quantity' item.item_id %}" class="mt-2">
+                                {% csrf_token %}
+                                <label for="new_quantity_{{ item.item_id }}">New Quantity:</label>
+                                <input type="number" id="new_quantity_{{ item.item_id }}" name="new_quantity" min="1" value="{{ item.quantity }}"
+                                        class="form-control form-control-sm d-inline-block w-auto" required>
+                                <button type="submit" class="btn btn-primary btn-sm ms-2">Update</button>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

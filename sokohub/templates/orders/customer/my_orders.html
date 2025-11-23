@@ -6,6 +6,29 @@
 
     <h2 class="mb-4">My Orders</h2>
 
+    <div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="mb-3 p-3 border rounded shadow-sm bg-light ">
+    <form method="POST" action="{% url 'create_order' %}">
+    {% csrf_token %}
+    <label>Order Phone:</label>
+    <input class="form-control mb-2 w-50" type="text" name="order_phone" placeholder="Order Phone">
+    <label>Delivery Address:</label>
+    <input class="form-control mb-2 w-50" type="text" name="order_delivery_address" placeholder="Order address">
+    <button class="btn btn-primary" type="submit">Initiate Order</button>
+    </form>
+    </div>
+    <hr>
+created
     {% if orders %}
         {% for order in orders %}
             <div class="card mb-3 shadow-sm">
@@ -19,11 +42,20 @@
                             <p class="text-muted mb-1">Status: {{ order.status }}</p>
                             <strong>Total: {{ order.total }} RWF</strong>
                         </div>
-
-                            <a href="{% url 'order_items' %}?order_id={{ order.order_id }}" 
+                    <div>
+                        <a href="{% url 'order_items' %}?order_id={{ order.order_id }}" 
                        class="btn btn-primary btn-sm">
                         View Items
                     </a>
+                        <a href="{% url 'cancel_order' order.order_id %}" 
+                       class="btn btn-warning btn-sm">
+                        Cancel Order
+                    </a>
+                        <a href="{% url 'delete_order' order.order_id %}" 
+                       class="btn btn-danger btn-sm">
+                        Delete Order
+                    </a>
+                    </div>
  
                     </div>
 

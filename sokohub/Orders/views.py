@@ -31,6 +31,9 @@ def create_order(request):
             )
 
             create_order.save()
+            messages.success(request, "Order created successfully")
+            return redirect('my_orders')
+
         except Exception as e:
             raise ValueError("Error creating order", e, "Reques user: ", request.user.user_id)  
     if user.user_type != 'customer':
@@ -72,9 +75,9 @@ def add_product_to_order(request):
             product_id=product,
             quantity=quantity
         )
-        context = {
-            "message":"Product is created"
-        }
+        order.total += product.price * int(quantity)
+        order.save()
+        messages.success(request, f"Product is Added to order {order_id} successfully")
         return redirect("all_products")
 
 
@@ -144,3 +147,64 @@ def get_user_active_orders_json(request):
         })
 
     return JsonResponse({'orders': order_list})
+
+
+@login_required
+def cancel_order(request, order_id):
+    try:
+        order = Order.objects.get(order_id=order_id, customer_id=request.user)
+        if order.status == 'pending':
+            order.status = 'cancelled'
+            order.save()
+            messages.success(request, "Order cancelled successfully.")
+        else:
+            messages.error(request, "Only pending orders can be cancelled.")
+    except Order.DoesNotExist:
+        messages.error(request, "Order not found.")
+    
+    return redirect('my_orders')
+
+@login_required
+def delete_order(request, order_id):
+    try:
+        order = Order.objects.get(order_id=order_id, customer_id=request.user)
+        order.delete()
+        messages.success(request, "Order deleted successfully.")
+    except Order.DoesNotExist:
+        messages.error(request, "Order not found.")
+    
+    return redirect('my_orders')
+
+@login_required
+def delete_order_item(request, item_id):
+    try:
+        order_item = OrderItem.objects.get(item_id=item_id, order_id__customer_id=request.user)
+        order = order_item.order_id
+        order.total -= order_item.product_id.price * order_item.quantity
+        order.save()
+        order_item.delete()
+        messages.success(request, "Order item deleted successfully.")
+    except OrderItem.DoesNotExist:
+        messages.error(request, "Order item not found.")
+    
+    return redirect('my_orders')
+
+
+@login_required
+def update_order_item_quantity(request, item_id):
+    if request.method == "POST":
+        new_quantity = request.POST.get('new_quantity')
+        try:
+            order_item = OrderItem.objects.get(item_id=item_id, order_id__customer_id=request.user)
+            order = order_item.order_id
+            order.total -= order_item.product_id.price * order_item.quantity
+            print("New Quantity:", new_quantity)
+            order_item.quantity = int(new_quantity)
+            order_item.save()
+            order.total += order_item.product_id.price * order_item.quantity
+            order.save()
+            messages.success(request, "Order item quantity updated successfully.")
+        except OrderItem.DoesNotExist:
+            messages.error(request, "Order item not found.")
+    
+    return redirect('my_orders')

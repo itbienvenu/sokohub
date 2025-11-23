@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Account
 from uuid import uuid4
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import AbstractBaseUser
 
@@ -26,7 +26,7 @@ def accounts_list(request):
         
         if len(password) < 8:
             messages.error(request, "Password must be at least 8 characters long.")
-            return redirect('account_create')
+            return redirect('account-create')
         
         new_account = Account(
             user_id=random.randint(111111,999999), 
@@ -69,7 +69,8 @@ def user_login(request):
             redirect_url = 'all_products' if user.user_type == 'customer' else 'vendor-dashboard'
             return redirect(redirect_url)
 
-        raise ValueError("Invalid email or password")
+        messages.error(request, "Invalid email or password.")
+        return redirect('user-login')
 
     return render(request, 'account/login.html')
 
@@ -79,3 +80,8 @@ def vendor_dashboard(request):
 
 def customer_dashboard(request):
     return render(request, 'account/customer/customer_page.html')
+
+def user_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('landing_page')

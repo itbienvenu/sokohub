@@ -28,6 +28,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    item_id = models.AutoField(primary_key=True)
     order_id = models.ForeignKey(Order, to_field='order_id', null=True, on_delete=models.SET_NULL)
     product_id = models.ForeignKey(Product, to_field='product_id', null=False, on_delete=models.CASCADE)
     quantity = models.IntegerField()
