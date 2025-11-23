@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import get_object_or_404, render,redirect
 from .models import Order, OrderItem
 from Product.models import Product
 from django.contrib.auth.decorators import login_required
@@ -214,6 +214,7 @@ def update_order_item_quantity(request, item_id):
     return redirect('my_orders')
 
 
+# Vendor views order items related to his/her products
 @login_required
 def vendor_order_items(request):
     vendor = request.user
@@ -234,6 +235,8 @@ def vendor_order_items(request):
         "vendor_orders": vendor_orders
     }
     return render(request, 'orders/vendor_order_items.html', context)
+
+
 
 # vendor get order items
 
@@ -270,23 +273,43 @@ def vendor_get_order_items(request, order_id):
     return JsonResponse({'items': serialized_data})
 
 
-
+# Vendor changes order status
 @login_required
-def vendor_order_update_order_status(request, order_id):
-    if request.method == "POST":
-        new_status = request.POST.get('status')
+def change_order_status(request):
+    vendor = request.user
+    
+    if not vendor.user_type == 'vendor':
+        messages.error(request, "Access denied. You must be a vendor to perform this action.")
+        return redirect('all_products')
+
+    order_id = request.POST.get('order_id')
+    new_status = request.POST.get('status')
+    
+    if not order_id or not new_status:
+        messages.error(request, "Error: Missing order ID or new status in the request.")
+        return redirect('vendor-order-items')
+
+    try:
+        if not OrderItem.objects.filter(order_id=order_id, product_id__user=vendor).exists():
+            messages.error(request, f"You are not authorized to modify Order #{order_id}.")
+            return redirect('vendor-order-items')
+            
+        order = get_object_or_404(Order, pk=order_id)
         
-        vendor = request.user
-        if not vendor.user_type == 'vendor':
-            messages.error(request, "Unauthorized access.")
-            return redirect('all_products')
+        valid_statuses = [choice[0] for choice in Order.STATUS_CHOICES]
+        if new_status not in valid_statuses:
+            messages.error(request, f"Invalid status selected: {new_status}")
+            return redirect('vendor-order-items')
 
-        try:
-            order = Order.objects.get(order_id=order_id)
-            order.status = new_status
-            order.save()
-            messages.success(request, f"Order {order_id} status updated to {new_status}.")
-        except Order.DoesNotExist:
-            messages.error(request, "Order not found.")
-
-    return redirect('vendor-order-items')
+        order.status = new_status
+        order.save()
+        
+        messages.success(request, f"Order #{order_id} status successfully updated to {new_status.capitalize()}.")
+        return redirect('vendor-order-items') 
+        
+    except Order.DoesNotExist:
+        messages.error(request, f"Error: Order ID {order_id} not found.")
+        return redirect('vendor-order-items')
+    except Exception as e:
+        messages.error(request, f"An unexpected error occurred: {e}")
+        return redirect('vendor-order-items')

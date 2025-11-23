@@ -7,14 +7,25 @@
 <div class="container mt-4">
     <h2 class="mb-4">Orders for Your Products</h2>
 
-    {% comment %} Assuming the context variable is now 'vendor_orders' {% endcomment %}
+    {% comment %} Message Display for Django Redirects {% endcomment %}
+    <div class="container alert-messages">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
     {% if vendor_orders %}
         <div class="table-responsive">
             <table class="table table-hover table-striped">
                 <thead class="table-dark">
                     <tr>
                         <th>Order ID</th>
-                        <th>Status</th>
+                        <th>Status Update</th>
                         <th>Customer Phone</th>
                         <th>Date</th>
                         <th>Action</th>
@@ -27,7 +38,19 @@
                                 {{ order.order_id }}
                             </td>
                             <td>
-                                <span class="badge bg-secondary">{{ order.status|capfirst }}</span>
+                                <form method="POST" action="{% url 'change_order_status' %}" class="d-flex" id="status-form-{{ order.order_id }}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="order_id" value="{{ order.order_id }}">
+
+                                    <select class="form-select form-select-sm" name="status" onchange="document.getElementById('status-form-{{ order.order_id }}').submit()">
+                                        {% for status_value, status_label in order.STATUS_CHOICES %}
+                                            <option value="{{ status_value }}" 
+                                                    {% if order.status == status_value %}selected{% endif %}>
+                                                {{ status_label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
                             </td>
                             <td>
                                 {{ order.phone }}
@@ -79,7 +102,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ... (Your existing viewOrderItems function goes here) ...
     console.log("Vendor Orders Page Loaded");
     
     function viewOrderItems(orderId) {
