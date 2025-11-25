@@ -10,7 +10,6 @@ from django.contrib import messages
 
 @login_required
 def create_product(request):
-    # [product_id, user_id, name, description, image, stock, quantity, price, status]
     user = request.user
     # vendor = Account.objects.get(pk=user.user_id)
     if request.method == 'POST':
@@ -20,7 +19,6 @@ def create_product(request):
         image = request.POST.get('product_image')
         stock = request.POST.get('product_stock')
         price = request.POST.get('product_price')     
-        quantity = request.POST.get('product_quantity')     
         # status = request.POST.get('product_status')
 
         new_product = Product(
@@ -31,7 +29,6 @@ def create_product(request):
             image=image, 
             stock=stock, 
             price=price, 
-            quantity=quantity
             )
         
         new_product.save()
@@ -100,7 +97,6 @@ def edit_product(request):
         try:
             product.stock = int(request.POST.get('product_stock'))
             product.price = float(request.POST.get('product_price'))
-            product.quantity = int(request.POST.get('product_quantity'))
         except (ValueError, TypeError):
             messages.error(request, "Stock, Price, and Quantity must be valid numbers.")
             return redirect('edit_product', product_id=p_id)
