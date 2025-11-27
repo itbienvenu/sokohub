@@ -1,9 +1,9 @@
+<!DOCTYPE html>
 <html lang="en">
-  <!DOCTYPE html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Product - Vendor Dashboard</title>
+    <title>Vendor Dashboard</title>
 
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -14,7 +14,55 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
 
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .navbar .nav-link.active {
+        position: relative;
+        color: #fff !important; 
+        font-weight: bold;
+      }
+
+      /* 2. Create the White Line using ::after on the Active Nav Link */
+      .navbar .nav-link.active::after {
+        content: ''; 
+        position: absolute;
+        bottom: -5px; 
+        left: 10%;
+        width: 80%; /* Makes the line slightly shorter than the link */
+        height: 3px;
+        background-color: #fff; /* White line for contrast on dark background */
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+      
+      .breadcrumb-item.active {
+          color: var(--bs-primary) !important; /* Use Bootstrap primary color (blue) */
+          font-weight: bold;
+      }
+      
+      .breadcrumb-item:not(.active) a {
+          position: relative;
+          text-decoration: none;
+          display: inline-block;
+          padding-bottom: 3px; /* Space for the line */
+      }
+      
+      .breadcrumb-item:not(.active) a::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0; /* Start with no width */
+          height: 2px;
+          background-color: var(--bs-primary); /* Blue line */
+          transition: width 0.3s ease;
+      }
+      
+      .breadcrumb-item:not(.active) a:hover::after {
+          width: 100%; /* Line grows to full width on hover */
+      }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -34,18 +82,25 @@
 
         <div id="navMenu" class="collapse navbar-collapse">
           <ul class="navbar-nav me-auto">
+            
+            {# 1. Dashboard Link #}
+            {% url 'vendor-dashboard' as dashboard_url %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'vendor-dashboard' %}">
+              <a class="nav-link {% if request.path == dashboard_url %}active{% endif %}" href="{{ dashboard_url }}">
                 <i class="fas fa-tachometer-alt me-1"></i>Dashboard
               </a>
             </li>
+
+            {% url 'vendor_products' as products_url %}
             <li class="nav-item">
-              <a class="nav-link active" href="{% url 'vendor_products' %}">
+              <a class="nav-link {% if request.path == products_url %}active{% endif %}" href="{{ products_url }}">
                 <i class="fas fa-box me-1"></i>My Products
               </a>
             </li>
+
+            {% url 'vendor-order-items' as orders_url %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'vendor-order-items' %}">
+              <a class="nav-link {% if request.path == orders_url %}active{% endif %}" href="{{ orders_url }}">
                 <i class="fas fa-shopping-bag me-1"></i>Orders
               </a>
             </li>
@@ -73,27 +128,47 @@
     </nav>
 
     <div class="container mt-4">
-      <!-- Breadcrumb -->
       <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a href="{% url 'vendor-dashboard'%}">Dashboard</a>
+          
+          {% url 'vendor-dashboard' as dashboard_url %}
+          {% url 'vendor_products' as products_url %}
+          {% url 'vendor_add_products' as add_products_url %}
+
+          <!-- Always visible starting point -->
+          <li class="breadcrumb-item {% if request.path == dashboard_url %}active{% endif %}">
+            {% if request.path == dashboard_url %}
+              Dashboard
+            {% else %}
+              <a href="{{ dashboard_url }}">Dashboard</a>
+            {% endif %}
           </li>
-          <li class="breadcrumb-item">
-            <a href="{% url 'vendor_products' %}">My Products</a>
+
+          <li class="breadcrumb-item {% if request.path == products_url %}active{% endif %}">
+            {% if request.path == products_url or request.path == add_products_url %}
+              {% if request.path == products_url %}
+                My Products
+              {% else %}
+                <a href="{{ products_url }}">My Products</a>
+              {% endif %}
+            {% endif %}
           </li>
-          <li class="breadcrumb-item active">
-            <a href="{% url 'vendor_add_products' %}">Add Product </a>
-          </li>
+
+          <!-- Final link (e.g., Add Product) -->
+          {% if request.path == add_products_url %}
+            <li class="breadcrumb-item active" aria-current="page">
+              Add Product
+            </li>
+          {% endif %}
+          
         </ol>
       </nav>
 
       <div>
-
         {% block content %}
-      {% endblock content %}
+        {% endblock content %}
       </div>
 
     {% block scripts %}{% endblock scripts %}
     </body>
-</html>      
+</html>
