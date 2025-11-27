@@ -4,11 +4,12 @@ from Account.models import Account
 from django.contrib.auth.decorators import login_required
 from uuid import uuid4
 from django.contrib import messages
-
+from Account.security import vendor_required, customer_required
 # Create your views here.
 
 
 @login_required
+@vendor_required
 def create_product(request):
     user = request.user
     # vendor = Account.objects.get(pk=user.user_id)
@@ -45,6 +46,8 @@ def get_all_products(request):
     return render(request, 'products/customer/products.html', context)
 
 
+@login_required
+@vendor_required
 def get_my_products(request):
     vendor = request.user
     # go in databse and fetch prodcts for loged in vendor
@@ -60,6 +63,7 @@ def vendor_add_products(request):
     return render(request, 'account/vendor/vendor_add_products.html')
 
 @login_required
+@vendor_required
 def edit_product(request):
     if request.method == "GET":
         product_id = request.GET.get('product_id')
@@ -109,6 +113,7 @@ def edit_product(request):
 
 
 @login_required
+@vendor_required
 def delete_product(request):
 
     product_id = request.POST.get('product_id') or request.GET.get('product_id')
@@ -136,6 +141,7 @@ def delete_product(request):
         return redirect("vendor_products")
     messages.warning(request, "Deletion requires confirmation.")
     return redirect("vendor_products")
+
 
 
 def product_details(request):

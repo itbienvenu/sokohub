@@ -1,21 +1,119 @@
-
 {% extends 'account/vendor/vendor_nav.html'%}
-{% comment %} {% extends '../products/index.html' %} {% endcomment %}
+
+{% block title %}Vendor Dashboard{% endblock title %}
+
 {% block content %}
+
+<div class="container mt-4">
+
+<!-- Django Messages Display -->
 {% if messages %}
-<div>
+<div class="container alert-messages mb-4">
     {% for message in messages %}
-        <div class="alert {{ message.tags }}">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
             {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     {% endfor %}
 </div>
 {% endif %}
 
-      </div>
+<h2 class="mb-4 text-center text-md-start">Your Business Overview</h2>
+
+<!-- DASHBOARD SUMMARY CARDS (Mobile Responsive Counts) -->
+<div class="row g-3 mb-5">
+    
+    <!-- Total Products Card -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card h-100 shadow-sm text-center border-primary border-3">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Total Products</h5>
+                <p class="card-text fs-2 fw-bold text-primary">{{ total_vendor_products|default:"0" }}</p>
+            </div>
+        </div>
     </div>
 
+    <!-- Active Products Card -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card h-100 shadow-sm text-center border-success border-3">
+            <div class="card-body">
+                <h5 class="card-title text-success">Active Products</h5>
+                <p class="card-text fs-2 fw-bold text-success">{{ activer_vendor_products|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Out of Stock Products Card -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card h-100 shadow-sm text-center border-warning border-3">
+            <div class="card-body">
+                <h5 class="card-title text-warning">Out of Stock</h5>
+                <p class="card-text fs-2 fw-bold text-warning">{{ out_of_stock_products|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
 
-{% endblock %}
+    <!-- Pending Orders Card -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="card h-100 shadow-sm text-center border-danger border-3">
+            <div class="card-body">
+                <h5 class="card-title text-danger">Pending Orders</h5>
+                <p class="card-text fs-2 fw-bold text-danger">{{ vendor_pending_orders|default:"0" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- TOP PERFORMING PRODUCTS SECTION -->
+<h3 class="mb-3 text-center text-md-start">Top Selling Products</h3>
+
+{% if top_most_vendor_products %}
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        Product Performance (By Sales/Quantity)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>Sales Qty</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in top_most_vendor_products %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <strong>{{ product.name }}</strong>
+                            <small class="d-block text-muted">ID: {{ product.product_id }}</small>
+                        </td>
+                        <td>{{ product.total_quantity_sold|default:"N/A" }}</td>
+                        <td>Ksh {{ product.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info" role="alert">
+    No recent sales data or top products found.
+</div>
+{% endif %}
+
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock scripts %}

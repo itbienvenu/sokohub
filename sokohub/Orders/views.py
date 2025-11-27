@@ -5,12 +5,13 @@ from django.contrib.auth.decorators import login_required
 import random
 from django.contrib import messages
 from django.http import JsonResponse
-
+from Account.security import vendor_required, customer_required
 from django.contrib import messages
 # Create your views here.
 
 # Customer creates an order
 @login_required
+@customer_required
 def create_order(request):
     user = request.user
     if request.method == "POST":
@@ -45,6 +46,7 @@ def create_order(request):
 
 # Customer views his/her orders
 @login_required
+@customer_required
 def list_my_orders(request):
     user = request.user
     
@@ -60,6 +62,7 @@ def list_my_orders(request):
 
 # Customer adds product to an order
 @login_required
+@customer_required
 def add_product_to_order(request):
     if request.method == "POST":
         order_id = request.POST.get('order_id')
@@ -86,6 +89,7 @@ def add_product_to_order(request):
 
 # Vendor views order items related to his/her products
 @login_required
+@vendor_required
 def vendor_order_items(request):
     vendor = request.user
 
@@ -107,6 +111,7 @@ def vendor_order_items(request):
 # customr get order items
 
 @login_required
+@customer_required
 def get_order_items(request):
     order_id = request.GET.get('order_id')
 
@@ -130,6 +135,7 @@ def get_order_items(request):
 
 
 @login_required
+@customer_required
 def get_user_active_orders_json(request):
     """
     Fetches the user's active orders (pending/processing) and returns them as JSON.
@@ -154,6 +160,7 @@ def get_user_active_orders_json(request):
 
 
 @login_required
+@customer_required
 def cancel_order(request, order_id):
     try:
         order = Order.objects.get(order_id=order_id, customer_id=request.user)
@@ -169,6 +176,7 @@ def cancel_order(request, order_id):
     return redirect('my_orders')
 
 @login_required
+@customer_required
 def delete_order(request, order_id):
     try:
         order = Order.objects.get(order_id=order_id, customer_id=request.user)
@@ -180,6 +188,7 @@ def delete_order(request, order_id):
     return redirect('my_orders')
 
 @login_required
+@customer_required
 def delete_order_item(request, item_id):
     try:
         order_item = OrderItem.objects.get(item_id=item_id, order_id__customer_id=request.user)
@@ -195,6 +204,7 @@ def delete_order_item(request, item_id):
 
 
 @login_required
+@customer_required
 def update_order_item_quantity(request, item_id):
     if request.method == "POST":
         new_quantity = request.POST.get('new_quantity')
@@ -216,6 +226,7 @@ def update_order_item_quantity(request, item_id):
 
 # Vendor views order items related to his/her products
 @login_required
+@vendor_required
 def vendor_order_items(request):
     vendor = request.user
     
@@ -241,6 +252,7 @@ def vendor_order_items(request):
 # vendor get order items
 
 @login_required
+@vendor_required
 def vendor_get_order_items(request, order_id):
     vendor = request.user
     
@@ -275,6 +287,7 @@ def vendor_get_order_items(request, order_id):
 
 # Vendor changes order status
 @login_required
+@vendor_required
 def change_order_status(request):
     vendor = request.user
     
