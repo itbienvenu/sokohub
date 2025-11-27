@@ -58,21 +58,11 @@
                                    required />
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="product_quantity" class="form-label">Total Quantity:</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="product_quantity" 
-                                       value="{{ product.quantity }}" 
-                                       name="product_quantity" 
-                                       required />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="product_stock" class="form-label">Current Stock:</label>
-                                <input type="number" 
-                                       class="form-control" 
-                                       id="product_stock" 
+                        <div class="mb-3">
+                            <label for="product_stock" class="form-label">Current Stock:</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="product_stock" 
                                        value="{{ product.stock }}" 
                                        name="product_stock" 
                                        required />

@@ -6,7 +6,7 @@ class Product(models.Model):
     product_id = models.CharField(primary_key=True)
     user = models.ForeignKey(Account, to_field='user_id', on_delete = models.CASCADE)
     image = models.CharField()
-    status = models.BooleanField(default=True)
+    status = models.CharField(default='active')
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)

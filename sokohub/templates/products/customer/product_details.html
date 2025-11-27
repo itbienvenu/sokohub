@@ -125,7 +125,6 @@ $(document).ready(function() {
                     orderSelect.removeClass('is-invalid');
                     orderSelect.append('<option value="" disabled selected>Select an Order</option>');
                     
-                    // Loop through the orders received from the JSON view
                     $.each(orders, function(index, order) {
                         orderSelect.append(
                             `<option value="${order.order_id}">Order #${order.order_id} (${order.status.capitalize()})</option>`

@@ -6,6 +6,7 @@ from uuid import uuid4
 from django.contrib import messages
 from Account.security import vendor_required, customer_required
 # Create your views here.
+from django.core.paginator import Paginator
 
 
 @login_required
@@ -38,13 +39,34 @@ def create_product(request):
     
 
 def get_all_products(request):
-    products = Product.objects.all().select_related('user')
-    
-    context = {
-        "products": products
-    }
-    return render(request, 'products/customer/products.html', context)
+    product_list = Product.objects.filter(status='active').select_related('user')
 
+    current_sort = request.GET.get('sort', '-created_at')
+    
+    if current_sort == 'price':
+        product_list = product_list.order_by('price')
+    elif current_sort == '-price':
+        product_list = product_list.order_by('-price')
+    else:
+        product_list = product_list.order_by('-created_at')
+
+    paginator = Paginator(product_list, 12)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # 4. Pass the required context to the template
+    context = {
+        "page_obj": page_obj,
+        
+        "paginator": paginator, 
+        
+        "current_sort": current_sort, 
+        
+        "is_paginated": paginator.num_pages > 1, 
+    }
+    
+    return render(request, 'products/customer/products.html', context)
 
 @login_required
 @vendor_required
@@ -97,6 +119,8 @@ def edit_product(request):
         product.name = request.POST.get('product_name')
         product.description = request.POST.get('product_description')
         product.image = request.POST.get('product_image')
+        product.status = request.POST.get('product_status')
+
 
         try:
             product.stock = int(request.POST.get('product_stock'))
