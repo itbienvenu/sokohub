@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class AccountManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
+
         if not email:
             raise ValueError('Users must have an email address')
         email = self.normalize_email(email)
