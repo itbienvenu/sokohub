@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        {% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+            style="height: 400px;">No Image</div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1>{{ product.name }}</h1>
+        <p class="text-muted">Sold by {{ product.vendor.username }}</p>
+        <h2 class="text-primary mb-3">${{ product.price }}</h2>
+
+        <p class="lead">{{ product.description }}</p>
+
+        <hr>
+
+        {% if product.stock > 0 %}
+        <form action="{% url 'checkout' product.pk %}" method="get">
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" class="form-control w-25" id="quantity" name="quantity" value="1" min="1"
+                    max="{{ product.stock }}">
+                <div class="form-text">In Stock: {{ product.stock }}</div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Buy Now</button>
+        </form>
+        {% else %}
+        <div class="alert alert-danger">Out of Stock</div>
+        <button class="btn btn-secondary btn-lg" disabled>Buy Now</button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
