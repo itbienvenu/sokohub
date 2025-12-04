@@ -3,42 +3,55 @@
 {% block content %}
 <h2 class="mb-4">Orders for My Products</h2>
 
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Customer</th>
-                <th>Address</th>
-                <th>Status</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in order_items %}
-            <tr>
-                <td>{{ item.order.id }}</td>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.order.customer.username }}</td>
-                <td>{{ item.order.delivery_address }}</td>
-                <td>
-                    {% if item.order.status == 'pending' %}
-                    <span class="badge bg-warning text-dark">Pending</span>
-                    {% else %}
-                    <span class="badge bg-success">Completed</span>
-                    {% endif %}
-                </td>
-                <td>{{ item.order.created_at|date:"M d, Y" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center">No orders yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order #</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Customer</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td class="fw-bold">#{{ item.order.id }}</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.order.customer.username }}</td>
+                        <td><small>{{ item.order.delivery_address }}</small></td>
+                        <td>
+                            {% if item.order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                            <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if item.order.status == 'pending' %}
+                            <a href="{% url 'mark_order_completed' item.order.pk %}" class="btn btn-sm btn-success">Mark
+                                Completed</a>
+                            {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled>Completed</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No orders yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

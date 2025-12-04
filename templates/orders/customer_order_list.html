@@ -3,41 +3,46 @@
 {% block content %}
 <h2 class="mb-4">My Orders</h2>
 
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Order #</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.created_at|date:"M d, Y" }}</td>
-                <td>${{ order.total }}</td>
-                <td>
-                    {% if order.status == 'pending' %}
-                    <span class="badge bg-warning text-dark">Pending</span>
-                    {% else %}
-                    <span class="badge bg-success">Completed</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'order_confirmation' order.pk %}" class="btn btn-sm btn-outline-primary">View
-                        Details</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">No orders yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Order #</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="fw-bold">#{{ order.id }}</td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td class="fw-bold">${{ order.total }}</td>
+                        <td>
+                            {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            {% else %}
+                            <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'order_confirmation' order.pk %}"
+                                class="btn btn-sm btn-outline-primary">View
+                                Details</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">No orders yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -68,3 +68,14 @@ def vendor_order_list(request):
     # Get all order items for products belonging to this vendor
     order_items = OrderItem.objects.filter(product__vendor=request.user).order_by('-order__created_at')
     return render(request, 'orders/vendor_order_list.html', {'order_items': order_items})
+
+@vendor_required
+def mark_order_completed(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    # Check if the vendor owns the product in this order
+    # Since checkout creates one order per product transaction, we can check the first item
+    order_item = order.items.first()
+    if order_item and order_item.product.vendor == request.user:
+        order.status = 'completed'
+        order.save()
+    return redirect('vendor_order_list')
