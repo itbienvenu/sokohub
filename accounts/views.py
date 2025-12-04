@@ -17,6 +17,7 @@ def register(request):
         form = RegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
 
+
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
     authentication_form = LoginForm
@@ -24,6 +25,6 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         user = self.request.user
         if user.user_type == 'vendor':
-            return '/vendor/dashboard/' # Hardcoding URL for now, will define name later
+            return '/vendor/dashboard/'
         else:
             return '/products/'

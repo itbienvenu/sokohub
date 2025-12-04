@@ -15,9 +15,9 @@
                 style="height: 200px;">No Image</div>
             {% endif %}
             <div class="card-body">
-                <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text text-primary fw-bold">${{ product.price }}</p>
-                <p class="card-text"><small class="text-muted">By {{ product.vendor.username }}</small></p>
+                <h5 class="card-title text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
+                <p class="card-text price-tag">${{ product.price }}</p>
+                <p class="card-text mb-2"><small class="text-muted">By {{ product.vendor.username }}</small></p>
 
                 {% if product.stock == 0 %}
                 <p class="text-danger fw-bold">Out of Stock</p>

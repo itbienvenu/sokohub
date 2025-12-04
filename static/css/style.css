@@ -1,0 +1,121 @@
+/* Global Styles */
+body {
+    background-color: #f2f3f7;
+    background-image: radial-gradient(#d7d7d7 1px, transparent 1px);
+    background-size: 20px 20px;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #333;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #fff !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 0.8rem 1rem;
+}
+
+.navbar-brand {
+    color: #ff6a00 !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    color: #333 !important;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: #ff6a00 !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #ff6a00;
+    border-color: #ff6a00;
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: #e55f00;
+    border-color: #e55f00;
+}
+
+.btn-outline-primary {
+    color: #ff6a00;
+    border-color: #ff6a00;
+}
+
+.btn-outline-primary:hover {
+    background-color: #ff6a00;
+    color: #fff;
+}
+
+/* Cards & Products */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    transition: transform 0.3s;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.card-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.card-text {
+    color: #666;
+}
+
+.price-tag {
+    color: #ff6a00;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Dashboard Stats */
+.dashboard-stat-card {
+    border-radius: 8px;
+    border: none;
+    color: white;
+}
+
+.bg-primary-gradient {
+    background: linear-gradient(45deg, #ff6a00, #ff8c00);
+}
+.bg-success-gradient {
+    background: linear-gradient(45deg, #11998e, #38ef7d);
+}
+.bg-danger-gradient {
+    background: linear-gradient(45deg, #cb2d3e, #ef473a);
+}
+.bg-warning-gradient {
+    background: linear-gradient(45deg, #fce38a, #f38181);
+    color: #333 !important;
+}
+
+/* Footer */
+.footer {
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    margin-top: 60px;
+}

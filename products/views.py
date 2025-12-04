@@ -45,7 +45,19 @@ def add_product(request):
             return redirect('vendor_product_list')
     else:
         form = ProductForm()
-    return render(request, 'products/product_form.html', {'form': form})
+    return render(request, 'products/product_form.html', {'form': form, 'title': 'Add New Product'})
+
+@vendor_required
+def edit_product(request, pk):
+    product = get_object_or_404(Product, pk=pk, vendor=request.user)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('vendor_product_list')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'products/product_form.html', {'form': form, 'title': 'Edit Product', 'product': product})
 
 @vendor_required
 def vendor_product_list(request):
