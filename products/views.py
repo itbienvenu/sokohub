@@ -10,8 +10,14 @@ def home(request):
     return render(request, 'products/home.html', {'products': products})
 
 def product_list(request):
-    products = Product.objects.filter(status='active').order_by('-created_at')
-    return render(request, 'products/product_list.html', {'products': products})
+    query = request.GET.get('q')
+    products = Product.objects.filter(status='active')
+    
+    if query:
+        products = products.filter(name__icontains=query)
+        
+    products = products.order_by('-created_at')
+    return render(request, 'products/product_list.html', {'products': products, 'query': query})
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)

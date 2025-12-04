@@ -23,8 +23,9 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <form class="d-flex mx-auto col-lg-6">
-                    <input class="form-control me-2" type="search" placeholder="Search products..." aria-label="Search">
+                <form class="d-flex mx-auto col-lg-6" action="{% url 'product_list' %}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search products..."
+                        aria-label="Search" value="{{ request.GET.q }}">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>
                 <ul class="navbar-nav ms-auto">

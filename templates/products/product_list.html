@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if query %}
+<h2 class="mb-4">Search Results for "{{ query }}"</h2>
+{% else %}
 <h2 class="mb-4">All Products</h2>
+{% endif %}
 
 <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
     {% for product in products %}
@@ -23,7 +27,7 @@
                 <p class="text-danger fw-bold">Out of Stock</p>
                 <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
                 {% else %}
-                <a href="{% url 'product_detail' product.pk %}" class="btn btn-outline-primary w-100">View Details</a>
+                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary w-100">View Details</a>
                 {% endif %}
             </div>
         </div>
