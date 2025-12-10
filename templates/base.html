@@ -48,6 +48,9 @@
                             class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
                             href="{% url 'product_list' %}">Products</a></li>
                     <li class="nav-item"><a
+                            class="nav-link {% if request.resolver_match.url_name == 'view_cart' %}active{% endif %}"
+                            href="{% url 'view_cart' %}">Cart</a></li>
+                    <li class="nav-item"><a
                             class="nav-link {% if request.resolver_match.url_name == 'customer_order_list' %}active{% endif %}"
                             href="{% url 'customer_order_list' %}">My Orders</a></li>
                     {% endif %}

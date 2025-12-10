@@ -27,7 +27,10 @@
                 <p class="text-danger fw-bold">Out of Stock</p>
                 <button class="btn btn-secondary w-100" disabled>Out of Stock</button>
                 {% else %}
-                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary w-100">View Details</a>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                    <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-outline-primary">Add to Cart</a>
+                </div>
                 {% endif %}
             </div>
         </div>
