@@ -28,16 +28,18 @@
                 </td>
                 <td>${{ item.product.price }}</td>
                 <td>
-                    <form action="{% url 'update_cart_item' item.pk %}" method="post" class="d-flex">
+                    <form class="d-flex">
                         {% csrf_token %}
                         <input type="number" name="quantity" value="{{ item.quantity }}" min="1"
-                            max="{{ item.product.stock }}" class="form-control form-control-sm" style="width: 70px;">
-                        <button type="submit" class="btn btn-sm btn-outline-secondary ms-2">Update</button>
+                            max="{{ item.product.stock }}" class="form-control form-control-sm" style="width: 70px;"
+                            hx-post="{% url 'update_cart_item' item.pk %}" hx-trigger="change delay:500ms"
+                            hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML">
                     </form>
                 </td>
                 <td>${{ item.total_price }}</td>
                 <td>
-                    <a href="{% url 'remove_from_cart' item.pk %}" class="btn btn-sm btn-danger">Remove</a>
+                    <a href="{% url 'remove_from_cart' item.pk %}" class="btn btn-sm btn-danger"
+                        hx-confirm="Are you sure you want to remove this item?">Remove</a>
                 </td>
             </tr>
             {% endfor %}
