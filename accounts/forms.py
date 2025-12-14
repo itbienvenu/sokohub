@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
+from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -21,3 +22,16 @@ class RegistrationForm(UserCreationForm):
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class CustomSocialSignupForm(SocialSignupForm):
+    user_type = forms.ChoiceField(
+        choices=User.USER_TYPE_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='I want to be a'
+    )
+
+    def save(self, request):
+        user = super(CustomSocialSignupForm, self).save(request)
+        user.user_type = self.cleaned_data['user_type']
+        user.save()
+        return user

@@ -172,3 +172,12 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+# Custom Adapter
+ACCOUNT_ADAPTER = 'accounts.adapters.MyAccountAdapter'
+
+# Social Account Settings
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_FORMS = {
+    'signup': 'accounts.forms.CustomSocialSignupForm',
+}
