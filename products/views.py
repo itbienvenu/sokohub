@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import vendor_required
 from .models import Product
-from .forms import ProductForm
+from .forms import ProductForm, ProductImageFormSet
 from orders.models import OrderItem
 
 def home(request):
-    products = Product.objects.filter(status='active').order_by('-created_at')[:8]
+    products = Product.objects.filter(status='active').order_by('-created_at').prefetch_related('additional_images')[:8]
     return render(request, 'products/home.html', {'products': products})
 
 def product_list(request):
@@ -44,26 +44,47 @@ def vendor_dashboard(request):
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
+        formset = ProductImageFormSet(request.POST, request.FILES)
+        if form.is_valid() and formset.is_valid():
             product = form.save(commit=False)
             product.vendor = request.user
             product.save()
+            
+            instances = formset.save(commit=False)
+            for instance in instances:
+                instance.product = product
+                instance.save()
+            formset.save_m2m() # Although no m2m here, good practice
+            
             return redirect('vendor_product_list')
     else:
         form = ProductForm()
-    return render(request, 'products/product_form.html', {'form': form, 'title': 'Add New Product'})
+        formset = ProductImageFormSet()
+    return render(request, 'products/product_form.html', {
+        'form': form, 
+        'formset': formset,
+        'title': 'Add New Product'
+    })
 
 @vendor_required
 def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk, vendor=request.user)
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
-        if form.is_valid():
+        formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.save()
             return redirect('vendor_product_list')
     else:
         form = ProductForm(instance=product)
-    return render(request, 'products/product_form.html', {'form': form, 'title': 'Edit Product', 'product': product})
+        formset = ProductImageFormSet(instance=product)
+    return render(request, 'products/product_form.html', {
+        'form': form, 
+        'formset': formset,
+        'title': 'Edit Product', 
+        'product': product
+    })
 
 @vendor_required
 def vendor_product_list(request):

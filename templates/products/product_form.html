@@ -21,6 +21,33 @@
                         {% endif %}
                     </div>
                     {% endfor %}
+
+                    <hr class="my-4">
+                    <h5 class="mb-3">Additional Images</h5>
+                    {{ formset.management_form }}
+                    <div id="image-form-list">
+                        {% for form in formset %}
+                        <div class="image-form mb-3 p-3 border rounded bg-light">
+                            {{ form.id }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Image</label>
+                                    {{ form.image }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Description</label>
+                                    {{ form.description }}
+                                </div>
+                            </div>
+                            {% if form.instance.pk %}
+                            <div class="mt-2">
+                                <label class="text-danger">Delete?</label> {{ form.DELETE }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Save Product</button>
                     <a href="{% url 'vendor_dashboard' %}" class="btn btn-secondary">Cancel</a>
                 </form>

@@ -27,7 +27,19 @@
                 <h5 class="card-title text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
                 <p class="card-text price-tag">${{ product.price }}</p>
                 <p class="card-text mb-2"><small class="text-muted">By {{ product.vendor.username }}</small></p>
-                <div class="d-grid gap-2">
+
+                {% if product.additional_images.all %}
+                <div class="mb-2 border-top pt-2">
+                    <small class="text-muted d-block fw-bold">Additional Info:</small>
+                    {% for img in product.additional_images.all %}
+                    {% if img.description %}
+                    <small class="text-muted d-block text-truncate">- {{ img.description }}</small>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2 mt-auto">
                     <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
                     <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-outline-primary">Add to Cart</a>
                 </div>
