@@ -12,3 +12,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+class PasswordResetOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    otp_hash = models.CharField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Password Reset Token for {self.user.username}"
