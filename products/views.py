@@ -10,15 +10,28 @@ def home(request):
     products = Product.objects.filter(status='active').order_by('-created_at').prefetch_related('additional_images')[:8]
     return render(request, 'products/home.html', {'products': products})
 
+from django.db.models import Count
+
 def product_list(request):
     query = request.GET.get('q')
+    category_id = request.GET.get('category')
     products = Product.objects.filter(status='active')
     
     if query:
         products = products.filter(name__icontains=query)
+    
+    if category_id:
+        products = products.filter(category_id=category_id)
         
     products = products.order_by('-created_at')
-    return render(request, 'products/product_list.html', {'products': products, 'query': query})
+    categories = VendorCategory.objects.annotate(product_count=Count('products')).all()
+    
+    return render(request, 'products/product_list.html', {
+        'products': products, 
+        'query': query,
+        'categories': categories,
+        'selected_category': int(category_id) if category_id else None
+    })
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)

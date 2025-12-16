@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0 rounded-4" style="height: 80vh;">
+                <div
+                    class="card-header bg-primary text-white p-3 rounded-top-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-robot me-2"></i>SokoBot</h5>
+                    <span class="badge bg-white text-primary rounded-pill">AI Assistant</span>
+                </div>
+
+                <div class="card-body p-0 d-flex flex-column bg-light">
+                    <!-- Chat Area -->
+                    <div id="chat-messages" class="flex-grow-1 p-3 overflow-auto" style="scroll-behavior: smooth;">
+                        <div class="alert alert-secondary text-center small mx-auto w-75 rounded-4 shadow-sm"
+                            role="alert">
+                            Messages are end-to-end encrypted for your privacy.
+                        </div>
+                        <!-- Messages go here -->
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="p-3 bg-white border-top rounded-bottom-4">
+                        <div class="input-group">
+                            <input type="text" id="user-input"
+                                class="form-control border-light-subtle bg-light rounded-start-pill ps-4"
+                                placeholder="Ask SokoBot to find products, check stats..." autofocus>
+                            <button class="btn btn-primary rounded-end-pill px-4" type="button" id="send-btn">
+                                <i class="bi bi-send-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Encryption Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rawKey = "{{ encryption_key }}";
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        let chatToken = localStorage.getItem('sokobot_token') || crypto.randomUUID();
+
+        // Key Derivation (Must match Python: SHA-256 digest of raw key)
+        const key = CryptoJS.SHA256(rawKey);
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `d-flex mb-3 ${role === 'user' ? 'justify-content-end' : 'justify-content-start'}`;
+
+            const bubble = document.createElement('div');
+            bubble.className = `p-3 rounded-4 shadow-sm ${role === 'user' ? 'bg-primary text-white' : 'bg-white text-dark'}`;
+            bubble.style.maxWidth = '80%';
+
+            // Format content nicely
+            if (role === 'assistant') {
+                // Simple markdown-like rendering for list items if needed or formatting
+                bubble.innerHTML = text.replace(/\n/g, '<br>');
+            } else {
+                bubble.textContent = text;
+            }
+
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            userInput.value = '';
+
+            try {
+                // 1. Encrypt Payload
+                const payload = {
+                    token: chatToken,
+                    message: text,
+                    user_id: {{ user.id|default: 'null'
+            }}
+    };
+
+    // Generate random IV (16 bytes)
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    const encrypted = CryptoJS.AES.encrypt(JSON.stringify(payload), key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+
+    // Combine IV and Ciphertext (Base64)
+    const ivBase64 = CryptoJS.enc.Base64.stringify(iv);
+    const ctBase64 = encrypted.toString(); // API returns Base64 by default
+    const payloadString = `${ivBase64}:${ctBase64}`;
+
+    // 2. Send Request
+    const response = await fetch('{% url "ai_chat" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ payload: payloadString })
+    });
+
+    const data = await response.json();
+
+    if (data.payload) {
+        // 3. Decrypt Response
+        const parts = data.payload.split(':');
+        const respIv = CryptoJS.enc.Base64.parse(parts[0]);
+        const respCt = parts[1];
+
+        const decrypted = CryptoJS.AES.decrypt(respCt, key, {
+            iv: respIv,
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        });
+
+        const respJson = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+        appendMessage('assistant', respJson.response);
+    } else if (data.error) {
+        appendMessage('assistant', `Error: ${data.error}`);
+    }
+
+            } catch (err) {
+        console.error(err);
+        appendMessage('assistant', "Sorry, I encountered an error securely processing your message.");
+    }
+        }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Initial Greeting
+    setTimeout(() => {
+        if (chatMessages.children.length <= 1) {
+            appendMessage('assistant', "Hello! I'm SokoBot. How can I help you today?");
+        }
+    }, 500);
+    });
+</script>
+{% endblock %}

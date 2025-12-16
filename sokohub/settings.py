@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'accounts',
     'products',
     'orders',
-    'django_htmx'
+    'django_htmx',
+    'ai_assistant',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'sokohub.context_processors.ai_settings',
             ],
         },
     },
