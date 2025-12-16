@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import vendor_required
-from .models import Product
-from .forms import ProductForm, ProductImageFormSet
+from .models import Product, VendorCategory
+from .forms import ProductForm, ProductImageFormSet, CategoryForm
 from orders.models import OrderItem
 
 def home(request):
@@ -43,7 +44,7 @@ def vendor_dashboard(request):
 @vendor_required
 def add_product(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
+        form = ProductForm(request.POST, request.FILES, user=request.user)
         formset = ProductImageFormSet(request.POST, request.FILES)
         if form.is_valid() and formset.is_valid():
             product = form.save(commit=False)
@@ -58,7 +59,7 @@ def add_product(request):
             
             return redirect('vendor_product_list')
     else:
-        form = ProductForm()
+        form = ProductForm(user=request.user)
         formset = ProductImageFormSet()
     return render(request, 'products/product_form.html', {
         'form': form, 
@@ -70,14 +71,14 @@ def add_product(request):
 def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk, vendor=request.user)
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance=product)
+        form = ProductForm(request.POST, request.FILES, instance=product, user=request.user)
         formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
             return redirect('vendor_product_list')
     else:
-        form = ProductForm(instance=product)
+        form = ProductForm(instance=product, user=request.user)
         formset = ProductImageFormSet(instance=product)
     return render(request, 'products/product_form.html', {
         'form': form, 
@@ -87,6 +88,52 @@ def edit_product(request, pk):
     })
 
 @vendor_required
+def delete_product(request, pk):
+    product = get_object_or_404(Product, pk=pk, vendor=request.user)
+    product.delete()
+    messages.success(request, 'Product deleted successfully')
+    return redirect('vendor_product_list')
+
+
+@vendor_required
 def vendor_product_list(request):
     products = Product.objects.filter(vendor=request.user).order_by('-created_at')
     return render(request, 'products/vendor_product_list.html', {'products': products})
+
+@vendor_required
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.vendor = request.user
+            category.save()
+            return redirect('vendor_category_list')
+    else:
+        form = CategoryForm()
+    return render(request, 'products/category_form.html', {'form': form})
+
+@vendor_required
+def edit_category(request, pk):
+    category = get_object_or_404(VendorCategory, pk=pk, vendor=request.user)
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('vendor_category_list')
+    else:
+        form = CategoryForm(instance=category)
+    return render(request, 'products/category_form.html', {'form': form, 'title': 'Edit Category'})
+
+@vendor_required
+def vendor_category_list(request):
+    categories = VendorCategory.objects.filter(vendor=request.user).order_by('-created_at')
+    return render(request, 'products/vendor_category_list.html', {'categories': categories})
+
+
+@vendor_required
+def delete_category(request, pk):
+    category = get_object_or_404(VendorCategory, pk=pk, vendor=request.user)
+    category.delete()
+    messages.success(request, 'Category deleted successfully')
+    return redirect('vendor_category_list')

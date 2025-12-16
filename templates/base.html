@@ -12,6 +12,11 @@
         body {
             padding-top: 70px;
         }
+
+        a {
+            cursor: pointer;
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -34,29 +39,36 @@
                 </div>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                            class="cursor-pointer nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
                             href="{% url 'home' %}">Home</a></li>
                     {% if user.is_authenticated %}
                     {% if user.user_type == 'vendor' %}
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'vendor_dashboard' %}active{% endif %}"
-                            href="{% url 'vendor_dashboard' %}">Dashboard</a></li>
+                            class="cursor-pointer nav-link {% if request.resolver_match.url_name == 'vendor_dashboard' %}active{% endif %}"
+                            hx-get="{% url 'vendor_dashboard' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Dashboard</a></li>
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'vendor_product_list' %}active{% endif %}"
-                            href="{% url 'vendor_product_list' %}">My Products</a></li>
+                            class="cursor-pointer nav-link {% if request.resolver_match.url_name == 'vendor_product_list' %}active{% endif %}"
+                            hx-get="{% url 'vendor_product_list' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">My Products</a></li>
+
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'vendor_order_list' %}active{% endif %}"
-                            href="{% url 'vendor_order_list' %}">Orders</a></li>
+                            class="cursor-pointer nav-link {% if request.resolver_match.url_name == 'vendor_order_list' %}active{% endif %}"
+                            hx-get="{% url 'vendor_order_list' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Orders</a></li>
                     {% else %}
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
-                            href="{% url 'product_list' %}">Products</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+                            hx-get="{% url 'product_list' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Products</a></li>
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'view_cart' %}active{% endif %}"
-                            href="{% url 'view_cart' %}">Cart</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'view_cart' %}active{% endif %}"
+                            hx-get="{% url 'view_cart' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Cart</a></li>
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'customer_order_list' %}active{% endif %}"
-                            href="{% url 'customer_order_list' %}">My Orders</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'customer_order_list' %}active{% endif %}"
+                            hx-get="{% url 'customer_order_list' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">My Orders</a></li>
                     {% endif %}
                     <li class="nav-item"><span class="nav-link">Hi, {{ user.username }}</span></li>
                     <li class="nav-item">
@@ -67,14 +79,17 @@
                     </li>
                     {% else %}
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
-                            href="{% url 'product_list' %}">Products</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}"
+                            hx-get="{% url 'product_list' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Products</a></li>
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
-                            href="{% url 'login' %}">Login</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}"
+                            hx-get="{% url 'login' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Login</a></li>
                     <li class="nav-item"><a
-                            class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}"
-                            href="{% url 'register' %}">Register</a></li>
+                            class=" cursor-pointer nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}"
+                            hx-get="{% url 'register' %}" hx-target="#main-content" hx-select="#main-content"
+                            hx-swap="outerHTML" hx-push-url="true">Register</a></li>
                     {% endif %}
                 </ul>
             </div>

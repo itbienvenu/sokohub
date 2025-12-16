@@ -17,8 +17,9 @@
     <div class="col">
         <div class="card h-100">
             {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
-                style="height: 200px; object-fit: cover;">
+            <img {% if product.image %} src="{{ product.image.url }}" {% else %}
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAAJ1BMVEXQ0NDw8PDKysrX19fp6enT09Ps7Ozc3Nzm5ubj4+Pg4ODNzc3z8/NXAHyOAAADYklEQVR4nO2c25KrIBREdRBQJ///vcdb5kTDVUFpqtdzqmRVb1Bhm6YhhBBCCCGEEEIIIYQQQgghhBBCCGnkzNODSIIUehwmRi3AhSaTvn2jBo2sI8eu3THgpiP69ogaQW0MLnM4kDaiM7nMpfb0yOKRxlxmACtttLm0Sj89tli0ssq0PVihycHu0rZg0QhHMFM0WLPGPmNmOqw6sy5lK+PT44vBfL/8kEGqM9daNoP0GPDrk0FaAbwyUCtATclUNWccT5krUKtZ43yaQXuecdcZ1Py3v5kBTpnGU2dYVeaOBi2Y6bnZOmuU+H16cNHY9wCeHtkJbPcaRBfLq7PCdJl3Z7/mTYe2kH0gup2OQtwA/ED0nVqElOpHwGXsgBB6nIA/niGEEEIIIYQQUjcSezdhh1SqGhvZta16ehCJ2JpZqtghkdsJg6rARv6dluDPm93JD3g2+1Ms7GyOJ3LINt/tUrirgOmkFDUbcxsbWFfBhq0lD9HG3l6IZ+NqlUSzcbd9Ytn4WliRuth9LkjZ+F1wbEJcUCotzAUjm1AXBJtwl/IrTTobJLFsfE3Fj1daRONJrMvdNnJUwU2acTV2v83ShBZoc8blVpu1oS6oHzC+xjabu96k3x+jBWRzLpcbs/n/YZ3X5rzLTTb644Kjuy3wbI2t3LCrrncXdM6bay432OjDBQeHy4UaW8m8Cnx/hjLYKu1qLjNZdweF4YKWSkvhMmWTz+VYYwsvYzbXa2yzyZWN0cVsk8olm43FZbIZf44uSWoso41+Wa/3OsybmHexAJv0d09rLgu7FTplLlls3C67ZwH3PzycIfHHusJeY2+bfC6JbXy5zGyVlrrGVhJWmu8z55Wl0nLkMpNsl8N03zfaTD/N5JKs0kJqbGXI55Iom7AaW0l23zeRwCbGJTOXbQpyuWxTlMtFm8JcLtkU53LBpkCX0zZFupy8exbqciqbYl1O2BTsEl1pRbtE2hTuEmVTvEvE7qD7nw0Loa8ml5maXIJkQt+RH6cmlwAZlBprA2RwcvHLILn4ZML3lEqgolw8MvLp0UVSUS5OGaA1eaOiXBwygC5WGbwaa60ykC4WGUwXswyoi1FGZz0gysi3ikTNxSQjhg4VQzICFsvSTAghhBBCCKmUn4ponn7VTck/evw2WVjiDMwAAAAASUVORK5CYII="
+                {% endif %} class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
             {% else %}
             <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
                 style="height: 200px;">No Image</div>

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+
+<h2>Vendor Category List</h2>
+<a hx-get="{% url 'add_category' %}" hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML"
+    hx-push-url="true" class=" cursor-pointer text-primary">Create New Category</a>
+{% if categories %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+        <tr>
+            <td>{{ category.name }}</td>
+            <td>{{ category.created_at }}</td>
+            <td>
+                <button type="button" hx-get="{% url 'edit_category' category.pk %}" hx-target="#main-content"
+                    hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true"
+                    class="btn btn-sm btn-outline-primary">Edit</button>
+                <a type="button" href="{% url 'delete_category' category.pk %}" hx-target="#main-content"
+                    hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true"
+                    class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No categories found.</p>
+{% endif %}
+{% endblock %}

@@ -41,8 +41,11 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Recent Products</h3>
     <div>
-        <a href="{% url 'add_product' %}" class="btn btn-primary">Add New Product</a>
-        <a href="{% url 'vendor_product_list' %}" class="btn btn-outline-primary">View All Products</a>
+        <button type="button" hx-get="{% url 'add_product' %}" hx-target="#main-content" hx-select="#main-content"
+            hx-swap="outerHTML" hx-push-url="true" class="btn btn-primary">Add New Product</button>
+        <button type="button" hx-get="{% url 'vendor_product_list' %}" hx-target="#main-content"
+            hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true" class="btn btn-outline-primary">View All
+            Products</button>
     </div>
 </div>
 
@@ -61,6 +64,9 @@
                 <h6 class="card-title">{{ product.name }}</h6>
                 <p class="card-text">${{ product.price }}</p>
                 <small class="text-muted">Stock: {{ product.stock }}</small>
+            </div>
+            <div class="card-footer">
+                <p>{{ product.category.name }}</p>
             </div>
         </div>
     </div>
