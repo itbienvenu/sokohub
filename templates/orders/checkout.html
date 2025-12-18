@@ -36,10 +36,83 @@
                         {% endif %}
                     </div>
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-3">Place Order</button>
+                    <div id="paypal-button-container" class="mt-4"></div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<!-- PayPal SDK -->
+<script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD"></script>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    paypal.Buttons({
+        createOrder: function (data, actions) {
+            // Validate Address/Phone
+            const address = document.getElementById('id_delivery_address').value;
+            const phone = document.getElementById('id_phone').value;
+
+            if (!address || !phone) {
+                alert("Please fill in Delivery Address and Phone Number first.");
+                return actions.reject();
+            }
+
+            return actions.order.create({
+                purchase_units: [{
+                    amount: {
+                        value: '{{ total_price|floatformat:2 }}'
+                    }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(function (details) {
+                // Call backend
+                const address = document.getElementById('id_delivery_address').value;
+                const phone = document.getElementById('id_phone').value;
+
+                fetch("{% url 'paypal_execute' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrftoken,
+                    },
+                    body: JSON.stringify({
+                        payment_id: details.id,
+                        delivery_address: address,
+                        phone: phone,
+                        mode: 'single',
+                        product_id: '{{ product.id }}',
+                        quantity: '{{ quantity }}'
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = "/orders/order/confirmation/" + data.order_id + "/";
+                        } else {
+                            alert("Transaction failed: " + data.error);
+                        }
+                    });
+            });
+        }
+    }).render('#paypal-button-container');
+</script>
 {% endblock %}

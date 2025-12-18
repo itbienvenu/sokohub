@@ -12,6 +12,8 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     delivery_address = models.TextField()
     phone = models.CharField(max_length=15)
+    is_paid = models.BooleanField(default=False)
+    payment_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

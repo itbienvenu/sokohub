@@ -6,6 +6,9 @@ from .models import Product, VendorCategory
 from django.db.models import Count, Avg
 from .forms import ProductForm, ProductImageFormSet, CategoryForm, ReviewForm
 from orders.models import OrderItem
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.db.models import Q
+from django.db import connection
 
 def home(request):
     products = Product.objects.filter(status='active').annotate(avg_rating=Avg('reviews__rating')).order_by('-created_at').prefetch_related('additional_images')[:8]
@@ -17,7 +20,26 @@ def product_list(request):
     products = Product.objects.filter(status='active').annotate(avg_rating=Avg('reviews__rating'))
     
     if query:
-        products = products.filter(name__icontains=query)
+        if connection.vendor == 'postgresql':
+            # "Elasticsearch-like" Full Text Search
+            # We weight the 'name' higher (A) than 'description' (B)
+            vector = SearchVector('name', weight='A') + \
+                     SearchVector('description', weight='B') + \
+                     SearchVector('category__name', weight='C')
+            
+            search_query = SearchQuery(query)
+            
+            products = products.annotate(
+                rank=SearchRank(vector, search_query)
+            ).filter(rank__gte=0.1).order_by('-rank')
+            
+        else:
+            # Fallback for SQLite or others: Standard "IContains" on multiple fields
+            products = products.filter(
+                Q(name__icontains=query) | 
+                Q(description__icontains=query) |
+                Q(category__name__icontains=query)
+            )
     
     if category_id:
         products = products.filter(category_id=category_id)

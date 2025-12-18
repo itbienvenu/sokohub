@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+import json
+from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.decorators import customer_required, vendor_required
 from products.models import Product
+from accounts.decorators import customer_required, vendor_required
+from products.models import Product
 from .models import Order, OrderItem, Cart, CartItem
 from .forms import OrderForm
+from django.conf import settings
 
 @customer_required
 def checkout(request, pk):
@@ -47,7 +53,8 @@ def checkout(request, pk):
         'product': product,
         'quantity': quantity,
         'total_price': total_price,
-        'form': form
+        'form': form,
+        'paypal_client_id': settings.PAYPAL_CLIENT_ID
     }
     return render(request, 'orders/checkout.html', context)
 
@@ -161,7 +168,8 @@ def checkout_cart(request):
     return render(request, 'orders/checkout_cart.html', {
         'cart': cart,
         'form': form,
-        'total_price': total_price
+        'total_price': total_price,
+        'paypal_client_id': settings.PAYPAL_CLIENT_ID
     })
 
 @customer_required
@@ -182,3 +190,77 @@ def update_order(request, pk):
         form = OrderForm(instance=order)
     
     return render(request, 'orders/update_order.html', {'order': order, 'form': form})
+
+@customer_required
+@transaction.atomic
+def paypal_execute(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+        
+    try:
+        data = json.loads(request.body)
+        payment_id = data.get('payment_id')
+        delivery_address = data.get('delivery_address')
+        phone = data.get('phone')
+        
+        # Determine if single product or cart
+        mode = data.get('mode') # 'single' or 'cart'
+        
+        order = Order.objects.create(
+            customer=request.user,
+            delivery_address=delivery_address,
+            phone=phone,
+            status='pending',
+            is_paid=True,
+            payment_id=payment_id
+        )
+        
+        total_price = 0
+        
+        if mode == 'single':
+            product_id = data.get('product_id')
+            quantity = int(data.get('quantity', 1))
+            product = get_object_or_404(Product, pk=product_id)
+            
+            if product.stock < quantity:
+                raise Exception("Insufficient stock")
+                
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=quantity,
+                price=product.price
+            )
+            product.stock -= quantity
+            product.save()
+            total_price = product.price * quantity
+            
+        elif mode == 'cart':
+            cart = get_object_or_404(Cart, customer=request.user)
+            if not cart.items.exists():
+                raise Exception("Cart is empty")
+                
+            for item in cart.items.all():
+                if item.product.stock < item.quantity:
+                    raise Exception(f"Insufficient stock for {item.product.name}")
+                    
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price
+                )
+                item.product.stock -= item.quantity
+                item.product.save()
+                
+            total_price = cart.total_price
+            # Clear Cart
+            cart.items.all().delete()
+            
+        order.total = total_price
+        order.save()
+        
+        return JsonResponse({'success': True, 'order_id': order.pk})
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)

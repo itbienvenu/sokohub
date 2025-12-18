@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'orders',
     'django_htmx',
     'ai_assistant',
+    'django.contrib.postgres',
 ]
 
 MIDDLEWARE = [
@@ -196,3 +197,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True        
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# PayPal Settings
+# Use 'test' for generic sandbox, or your specific sandbox client ID
+PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', 'test')

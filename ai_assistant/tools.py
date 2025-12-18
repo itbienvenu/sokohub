@@ -2,6 +2,8 @@ from products.models import Product, VendorCategory
 from orders.models import Cart, CartItem, Order, OrderItem
 from django.db.models import Sum, Count, Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.db import connection
 
 def search_products(query=None, min_price=None, max_price=None, category_name=None):
     """
@@ -10,7 +12,16 @@ def search_products(query=None, min_price=None, max_price=None, category_name=No
     products = Product.objects.filter(status='active')
 
     if query:
-        products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        if connection.vendor == 'postgresql':
+            vector = SearchVector('name', weight='A') + \
+                     SearchVector('description', weight='B') + \
+                     SearchVector('category__name', weight='C')
+            search_query = SearchQuery(query)
+            products = products.annotate(
+                rank=SearchRank(vector, search_query)
+            ).filter(rank__gte=0.1).order_by('-rank')
+        else:
+            products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
     
     if min_price is not None:
         products = products.filter(price__gte=min_price)
