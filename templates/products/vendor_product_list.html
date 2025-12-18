@@ -9,6 +9,20 @@
         hx-swap="outerHTML" hx-push-url="true" class="btn btn-outline-primary">Categories</button>
 </div>
 
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="btn-group">
+            <a href="?sort=created_at"
+                class="btn btn-outline-secondary {% if sort_by == 'created_at' %}active{% endif %}">Most Recent</a>
+            <a href="?sort=rating_desc"
+                class="btn btn-outline-secondary {% if sort_by == 'rating_desc' %}active{% endif %}">Top Rated</a>
+            <a href="?sort=review_count_desc"
+                class="btn btn-outline-secondary {% if sort_by == 'review_count_desc' %}active{% endif %}">Most
+                Reviewed</a>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <div class="table-responsive">
@@ -18,6 +32,7 @@
                         <th>Image</th>
                         <th>Name</th>
                         <th>Price</th>
+                        <th>Rating</th>
                         <th>Stock</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -37,6 +52,21 @@
                         <td class="fw-bold">{{ product.name }}</td>
                         <td class="price-tag" style="font-size: 1rem;">${{ product.price }}</td>
                         <td>
+                            <div class="d-flex flex-column">
+                                {% if product.avg_rating %}
+                                <div class="text-warning small text-nowrap">
+                                    <i class="bi bi-star-fill"></i> {{ product.avg_rating|floatformat:1 }}
+                                </div>
+                                <a href="{% url 'vendor_product_reviews' product.pk %}"
+                                    class="small text-decoration-none">
+                                    {{ product.review_count }} reviews
+                                </a>
+                                {% else %}
+                                <span class="text-muted small">No reviews</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
                             {% if product.stock == 0 %}
                             <span class="text-danger fw-bold">Out of Stock</span>
                             {% else %}
@@ -51,17 +81,23 @@
                             {% endif %}
                         </td>
                         <td>
-                            <button type="button" hx-get="{% url 'edit_product' product.pk %}" hx-target="#main-content"
-                                hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true"
-                                class="btn btn-sm btn-outline-primary">Edit</button>
-                            <button type="button" hx-get="{% url 'delete_product' product.pk %}"
-                                hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML"
-                                hx-push-url="true" class="btn btn-sm btn-outline-danger">Delete</button>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'vendor_product_reviews' product.pk %}"
+                                    class="btn btn-sm btn-outline-info" title="Reviews">
+                                    <i class="bi bi-chat-text"></i>
+                                </a>
+                                <button type="button" hx-get="{% url 'edit_product' product.pk %}"
+                                    hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML"
+                                    hx-push-url="true" class="btn btn-sm btn-outline-primary">Edit</button>
+                                <button type="button" hx-get="{% url 'delete_product' product.pk %}"
+                                    hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML"
+                                    hx-push-url="true" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-4">No products yet.</td>
+                        <td colspan="7" class="text-center py-4">No products yet.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

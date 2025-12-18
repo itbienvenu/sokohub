@@ -37,9 +37,7 @@ class Product(models.Model):
             return sum([r.rating for r in reviews]) / len(reviews)
         return 0
 
-    @property
-    def review_count(self):
-        return self.reviews.count()
+
 
 
 class ProductImage(models.Model):
@@ -56,6 +54,8 @@ class Review(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.IntegerField(default=5, choices=[(i, str(i)) for i in range(1, 6)])
     comment = models.TextField(blank=True)
+    vendor_reply = models.TextField(blank=True, null=True)
+    replied_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

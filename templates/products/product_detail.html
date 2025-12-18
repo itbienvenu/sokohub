@@ -105,6 +105,16 @@
                     {% if review.comment %}
                     <p class="mb-0 mt-2">{{ review.comment }}</p>
                     {% endif %}
+
+                    {% if review.vendor_reply %}
+                    <div class="bg-white p-3 rounded mt-3 ms-4 border-start border-3 border-warning">
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="badge bg-warning text-dark me-2">Seller Response</span>
+                            <small class="text-muted">{{ review.replied_at|date:"F d, Y" }}</small>
+                        </div>
+                        <p class="mb-0 text-muted small">{{ review.vendor_reply }}</p>
+                    </div>
+                    {% endif %}
                 </div>
                 {% empty %}
                 <p class="text-muted">No reviews yet. Be the first to review this product!</p>

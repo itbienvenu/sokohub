@@ -133,8 +133,49 @@ def delete_product(request, pk):
 
 @vendor_required
 def vendor_product_list(request):
-    products = Product.objects.filter(vendor=request.user).order_by('-created_at')
-    return render(request, 'products/vendor_product_list.html', {'products': products})
+    sort_by = request.GET.get('sort', 'created_at')
+    
+    products = Product.objects.filter(vendor=request.user).annotate(
+        avg_rating=Avg('reviews__rating'),
+        review_count=Count('reviews')
+    )
+    
+    if sort_by == 'rating_desc':
+        products = products.order_by('-avg_rating', '-created_at')
+    elif sort_by == 'review_count_desc':
+        products = products.order_by('-review_count', '-created_at')
+    else: # default
+        products = products.order_by('-created_at')
+        
+    return render(request, 'products/vendor_product_list.html', {
+        'products': products,
+        'sort_by': sort_by
+    })
+
+@vendor_required
+def vendor_product_reviews(request, pk):
+    product = get_object_or_404(Product, pk=pk, vendor=request.user)
+    reviews = product.reviews.all().order_by('-created_at')
+    return render(request, 'products/vendor_product_reviews.html', {
+        'product': product,
+        'reviews': reviews
+    })
+
+from django.utils import timezone
+from .models import Review
+
+@vendor_required
+def vendor_reply_review(request, pk):
+    review = get_object_or_404(Review, pk=pk, product__vendor=request.user)
+    if request.method == 'POST':
+        reply = request.POST.get('reply')
+        if reply:
+            review.vendor_reply = reply
+            review.replied_at = timezone.now()
+            review.save()
+            messages.success(request, 'Reply submitted successfully')
+    
+    return redirect('vendor_product_reviews', pk=review.product.pk)
 
 @vendor_required
 def add_category(request):
