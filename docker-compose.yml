@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn sokohub.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      # HOST_PORT:CONTAINER_PORT
+      # We use 8001 on the host to avoid conflicting with your existing service (likely on 80/8080/8000)
+      - "8001:8000"
+    env_file:
+      - .env
+    environment:
+      - DEBUG=0
+      - SQL_ENGINE=django.db.backends.postgresql
+      - SQL_DATABASE=sokohub_db
+      - SQL_USER=sokohub
+      - SQL_PASSWORD=sokohub_password
+      - SQL_HOST=db
+      - SQL_PORT=5432
+      - DATABASE=postgres
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=sokohub
+      - POSTGRES_PASSWORD=sokohub_password
+      - POSTGRES_DB=sokohub_db
+    restart: always
+
+volumes:
+  postgres_data:

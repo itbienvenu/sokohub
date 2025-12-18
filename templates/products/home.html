@@ -1,52 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block container_class %}p-0 container-fluid{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white shadow-sm rounded-3">
-    <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold text-dark">Welcome to Soko Hub</h1>
-        <p class="col-md-8 fs-4 text-muted">Your one-stop marketplace for everything you need. Browse our latest
-            products from
-            trusted vendors.</p>
-        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg" type="button">Browse Products</a>
-    </div>
-</div>
+<style>
+    /* Hero Styles */
+    .alibaba-hero {
+        background-image: url('https://s.alicdn.com/@img/imgextra/i4/O1CN01ustqhi1Tz44lu4arh_!!6000000002452-0-tps-3840-1248.jpg_q60.jpg');
+        background-size: cover;
+        background-position: center;
+        min-height: 550px;
+        position: relative;
+    }
 
-<h2 class="mb-4">New Arrivals</h2>
-<div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-    {% for product in products %}
-    <div class="col">
-        <div class="card h-100">
-            {% if product.image %}
-            <img {% if product.image %} src="{{ product.image.url }}" {% else %}
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMwAAADACAMAAAB/Pny7AAAAJ1BMVEXQ0NDw8PDKysrX19fp6enT09Ps7Ozc3Nzm5ubj4+Pg4ODNzc3z8/NXAHyOAAADYklEQVR4nO2c25KrIBREdRBQJ///vcdb5kTDVUFpqtdzqmRVb1Bhm6YhhBBCCCGEEEIIIYQQQgghhBBCCGnkzNODSIIUehwmRi3AhSaTvn2jBo2sI8eu3THgpiP69ogaQW0MLnM4kDaiM7nMpfb0yOKRxlxmACtttLm0Sj89tli0ssq0PVihycHu0rZg0QhHMFM0WLPGPmNmOqw6sy5lK+PT44vBfL/8kEGqM9daNoP0GPDrk0FaAbwyUCtATclUNWccT5krUKtZ43yaQXuecdcZ1Py3v5kBTpnGU2dYVeaOBi2Y6bnZOmuU+H16cNHY9wCeHtkJbPcaRBfLq7PCdJl3Z7/mTYe2kH0gup2OQtwA/ED0nVqElOpHwGXsgBB6nIA/niGEEEIIIYQQUjcSezdhh1SqGhvZta16ehCJ2JpZqtghkdsJg6rARv6dluDPm93JD3g2+1Ms7GyOJ3LINt/tUrirgOmkFDUbcxsbWFfBhq0lD9HG3l6IZ+NqlUSzcbd9Ytn4WliRuth9LkjZ+F1wbEJcUCotzAUjm1AXBJtwl/IrTTobJLFsfE3Fj1daRONJrMvdNnJUwU2acTV2v83ShBZoc8blVpu1oS6oHzC+xjabu96k3x+jBWRzLpcbs/n/YZ3X5rzLTTb644Kjuy3wbI2t3LCrrncXdM6bay432OjDBQeHy4UaW8m8Cnx/hjLYKu1qLjNZdweF4YKWSkvhMmWTz+VYYwsvYzbXa2yzyZWN0cVsk8olm43FZbIZf44uSWoso41+Wa/3OsybmHexAJv0d09rLgu7FTplLlls3C67ZwH3PzycIfHHusJeY2+bfC6JbXy5zGyVlrrGVhJWmu8z55Wl0nLkMpNsl8N03zfaTD/N5JKs0kJqbGXI55Iom7AaW0l23zeRwCbGJTOXbQpyuWxTlMtFm8JcLtkU53LBpkCX0zZFupy8exbqciqbYl1O2BTsEl1pRbtE2hTuEmVTvEvE7qD7nw0Loa8ml5maXIJkQt+RH6cmlwAZlBprA2RwcvHLILn4ZML3lEqgolw8MvLp0UVSUS5OGaA1eaOiXBwygC5WGbwaa60ykC4WGUwXswyoi1FGZz0gysi3ikTNxSQjhg4VQzICFsvSTAghhBBCCKmUn4ponn7VTck/evw2WVjiDMwAAAAASUVORK5CYII="
-                {% endif %} class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
-            {% else %}
-            <div class="bg-secondary text-white d-flex align-items-center justify-content-center"
-                style="height: 200px;">No Image</div>
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
-                <p class="card-text price-tag">${{ product.price }}</p>
-                <p class="card-text mb-2"><small class="text-muted">By {{ product.vendor.username }}</small></p>
+    .hero-overlay {
+        background: rgba(0, 0, 0, 0.4);
+        /* Darken image for text readability */
+    }
 
-                {% if product.additional_images.all %}
-                <div class="mb-2 border-top pt-2">
-                    <small class="text-muted d-block fw-bold">Additional Info:</small>
-                    {% for img in product.additional_images.all %}
-                    {% if img.description %}
-                    <small class="text-muted d-block text-truncate">- {{ img.description }}</small>
-                    {% endif %}
-                    {% endfor %}
+    .search-container {
+        max-width: 700px;
+        width: 100%;
+    }
+
+    .hero-input {
+        height: 55px;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        background: transparent;
+    }
+
+    .hero-input:focus {
+        box-shadow: none;
+        background: transparent;
+    }
+
+    .hero-search-btn {
+        background-color: #ff6a00;
+        border: none;
+        color: white;
+        font-weight: bold;
+        transition: background 0.3s;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+
+    .hero-search-btn:hover {
+        background-color: #e55f00;
+    }
+
+    /* Value Props Strip */
+    .value-props-strip {
+        background-color: #3e261d;
+        /* Approximate deep brown/red from Alibaba */
+        color: white;
+    }
+
+    .value-prop-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        opacity: 0.9;
+        background: rgba(255, 255, 255, 0.1);
+        width: 60px;
+        height: 60px;
+        line-height: 60px;
+        text-align: center;
+        border-radius: 50%;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="alibaba-hero d-flex align-items-center justify-content-center">
+    <!-- Dark overlay -->
+    <div class="hero-overlay position-absolute w-100 h-100 top-0 start-0"></div>
+
+    <div class="container position-relative text-white z-1">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-0 col-md-10 offset-md-1">
+                <div class="d-flex align-items-center mb-4">
+                    <a href="#" class="text-white text-decoration-none d-flex align-items-center">
+                        <i class="bi bi-play-circle me-2 fs-5"></i>
+                        <span class="fs-5">Learn about SokoHub</span>
+                    </a>
                 </div>
-                {% endif %}
 
-                <div class="d-grid gap-2 mt-auto">
-                    <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
-                    <a href="{% url 'add_to_cart' product.pk %}" class="btn btn-outline-primary">Add to Cart</a>
+                <h1 class="display-4 fw-bold mb-4">The leading ecomerce<br>platform for global trade</h1>
+
+                <div class="search-container bg-white p-1 rounded-pill shadow-lg d-flex align-items-center mt-5">
+                    <form action="{% url 'product_list' %}" method="get" class="w-100 d-flex align-items-center">
+                        <input type="text" name="q"
+                            class="form-control hero-input flex-grow-1 border-0 rounded-pill ps-4"
+                            placeholder="What are you looking for?">
+                        <button type="submit"
+                            class="hero-search-btn btn rounded-pill px-5 me-1 d-flex align-items-center justify-content-center">
+                            Search
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    {% endfor %}
 </div>
+
+<!-- Value Propositions -->
+<div class="value-props-strip py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="d-flex flex-column h-100">
+                    <div class="mb-3">
+                        <i class="bi bi-grid-3x3-gap value-prop-icon d-inline-block"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Millions of business offerings</h5>
+                    <p class="small text-white-50 mb-0">Explore products and suppliers for your business.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="d-flex flex-column h-100">
+                    <div class="mb-3">
+                        <i class="bi bi-shield-check value-prop-icon d-inline-block"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Assured quality and transactions</h5>
+                    <p class="small text-white-50 mb-0">Ensure production quality from verified suppliers.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="d-flex flex-column h-100">
+                    <div class="mb-3">
+                        <i class="bi bi-globe value-prop-icon d-inline-block"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">One-stop trading solution</h5>
+                    <p class="small text-white-50 mb-0">Order seamlessly from product/supplier search to order
+                        management.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="d-flex flex-column h-100">
+                    <div class="mb-3">
+                        <i class="bi bi-sliders value-prop-icon d-inline-block"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Tailored trading experience</h5>
+                    <p class="small text-white-50 mb-0">Get curated benefits, such as exclusive discounts and
+                        protection.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Existing: New Arrivals -->
+<div class="container py-5 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h2 class="fw-bold text-dark m-0">New Arrivals</h2>
+        <a href="{% url 'product_list' %}" class="text-decoration-none fw-bold text-primary">View All Products <i
+                class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-shadow transition-all">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                    style="height: 220px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light text-secondary d-flex align-items-center justify-content-center"
+                    style="height: 220px;">
+                    <i class="bi bi-image fs-1"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-truncate fw-bold mb-1" title="{{ product.name }}">{{ product.name }}</h6>
+                    <p class="card-text price-tag mb-1 text-primary fw-bold">${{ product.price }}</p>
+                    <p class="card-text mb-2 small"><small class="text-muted">By {{ product.vendor.username }}</small>
+                    </p>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'product_detail' product.pk %}"
+                            class="btn btn-outline-primary btn-sm rounded-pill">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No products available yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>
 {% endblock %}
