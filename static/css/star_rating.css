@@ -1,0 +1,42 @@
+/* ... existing styles ... */
+
+/* Star Rating */
+.star-rating {
+    color: #ffc107;
+    /* Bootstrap warning color */
+    font-size: 1.2rem;
+}
+
+.star-rating .bi-star,
+.star-rating .bi-star-fill,
+.star-rating .bi-star-half {
+    margin-right: 2px;
+}
+
+.star-rating.large {
+    font-size: 2rem;
+}
+
+.star-rating.small {
+    font-size: 0.9rem;
+}
+
+/* User Review Styles */
+.review-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #6c757d;
+}

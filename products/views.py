@@ -3,19 +3,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import vendor_required
 from .models import Product, VendorCategory
-from .forms import ProductForm, ProductImageFormSet, CategoryForm
+from django.db.models import Count, Avg
+from .forms import ProductForm, ProductImageFormSet, CategoryForm, ReviewForm
 from orders.models import OrderItem
 
 def home(request):
-    products = Product.objects.filter(status='active').order_by('-created_at').prefetch_related('additional_images')[:8]
+    products = Product.objects.filter(status='active').annotate(avg_rating=Avg('reviews__rating')).order_by('-created_at').prefetch_related('additional_images')[:8]
     return render(request, 'products/home.html', {'products': products})
-
-from django.db.models import Count
 
 def product_list(request):
     query = request.GET.get('q')
     category_id = request.GET.get('category')
-    products = Product.objects.filter(status='active')
+    products = Product.objects.filter(status='active').annotate(avg_rating=Avg('reviews__rating'))
     
     if query:
         products = products.filter(name__icontains=query)
@@ -35,7 +34,31 @@ def product_list(request):
 
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    return render(request, 'products/product_detail.html', {'product': product})
+    
+    # Handle Review Submission
+    if request.method == 'POST' and request.user.is_authenticated:
+        review_form = ReviewForm(request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            messages.success(request, 'Your review has been submitted!')
+            return redirect('product_detail', pk=pk)
+    else:
+        review_form = ReviewForm()
+
+    reviews = product.reviews.all()
+    avg_rating = reviews.aggregate(Avg('rating'))['rating__avg'] or 0
+    
+    context = {
+        'product': product,
+        'reviews': reviews,
+        'review_form': review_form,
+        'avg_rating': avg_rating,
+        'review_count': reviews.count(),
+    }
+    return render(request, 'products/product_detail.html', context)
 
 @vendor_required
 def vendor_dashboard(request):

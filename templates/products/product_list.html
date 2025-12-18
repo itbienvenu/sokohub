@@ -58,6 +58,15 @@
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
+                        <div class="mb-1">
+                            {% if product.avg_rating %}
+                            <span class="text-warning small">
+                                <i class="bi bi-star-fill"></i> {{ product.avg_rating|floatformat:1 }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted small" style="font-size: 0.8rem;">No ratings</span>
+                            {% endif %}
+                        </div>
                         <p class="card-text price-tag">${{ product.price }}</p>
                         <p class="card-text mb-2"><small class="text-muted">By {{ product.vendor.username }}</small></p>
 

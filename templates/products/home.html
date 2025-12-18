@@ -151,7 +151,6 @@
     </div>
 </div>
 
-<!-- Existing: New Arrivals -->
 <div class="container py-5 mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
         <h2 class="fw-bold text-dark m-0">New Arrivals</h2>
@@ -174,13 +173,25 @@
                 {% endif %}
                 <div class="card-body">
                     <h6 class="card-title text-truncate fw-bold mb-1" title="{{ product.name }}">{{ product.name }}</h6>
+                    <div class="mb-1">
+                        {% if product.avg_rating %}
+                        <span class="text-warning small">
+                            <i class="bi bi-star-fill"></i> {{ product.avg_rating|floatformat:1 }}
+                        </span>
+                        {% else %}
+                        <span class="text-muted small" style="font-size: 0.8rem;">No ratings</span>
+                        {% endif %}
+                    </div>
                     <p class="card-text price-tag mb-1 text-primary fw-bold">${{ product.price }}</p>
                     <p class="card-text mb-2 small"><small class="text-muted">By {{ product.vendor.username }}</small>
                     </p>
 
                     <div class="d-grid gap-2 mt-3">
-                        <a href="{% url 'product_detail' product.pk %}"
-                            class="btn btn-outline-primary btn-sm rounded-pill">View Details</a>
+                        <a href="{% url 'product_detail' product.pk %}" hx-get="{% url 'product_detail' product.pk %}"
+                            hx-target="#main-content" hx-select="#main-content" hx-swap="outerHTML" hx-push-url="true"
+                            class="btn btn-outline-primary btn-sm rounded-pill">
+                            View Details
+                        </a>
                     </div>
                 </div>
             </div>

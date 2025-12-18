@@ -37,6 +37,15 @@
                 <p class="text-muted mb-3">Sold by <strong class="text-dark">{{ product.vendor.username }}</strong></p>
                 <h2 class="price-tag mb-4" style="font-size: 2rem;">${{ product.price }}</h2>
 
+                <!-- Rating Summary -->
+                <div class="d-flex align-items-center mb-4">
+                    <div class="star-rating me-2">
+                        <i class="bi bi-star-fill text-warning"></i>
+                        <span class="fw-bold text-dark">{{ avg_rating|floatformat:1 }}</span>
+                    </div>
+                    <span class="text-muted">({{ review_count }} reviews)</span>
+                </div>
+
                 <div class="mb-4">
                     <h5>Description</h5>
                     <p class="text-secondary">{{ product.description }}</p>
@@ -60,6 +69,74 @@
                 <div class="alert alert-danger">Out of Stock</div>
                 <button class="btn btn-secondary btn-lg w-100" disabled>Buy Now</button>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <hr class="my-5">
+        <div class="row">
+            <div class="col-md-7">
+                <h3 class="mb-4">Customer Reviews</h3>
+
+                {% for review in reviews %}
+                <div class="review-card p-3 mb-3 bg-light rounded">
+                    <div class="d-flex justify-content-between">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="avatar-placeholder me-2 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px;">
+                                {{ review.user.username|make_list|first|upper }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ review.user.username }}</h6>
+                                <small class="text-muted">{{ review.created_at|date:"F d, Y" }}</small>
+                            </div>
+                        </div>
+                        <div class="star-rating text-warning">
+                            {% with ''|center:5 as range %}
+                            {% for _ in range %}
+                            {% if forloop.counter <= review.rating %} <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                                {% endwith %}
+                        </div>
+                    </div>
+                    {% if review.comment %}
+                    <p class="mb-0 mt-2">{{ review.comment }}</p>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 80px;">
+                    <div class="card-body">
+                        <h4 class="mb-3">Write a Review</h4>
+                        {% if user.is_authenticated %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                {{ review_form.rating }}
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Review</label>
+                                {{ review_form.comment }}
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+                        </form>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-lock fs-1 text-muted mb-3"></i>
+                            <p>Please <a href="{% url 'login' %}?next={{ request.path }}">login</a> to write a review.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

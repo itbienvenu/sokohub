@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product, ProductImage, VendorCategory
+from .models import Product, ProductImage, VendorCategory, Review
 from django.forms import inlineformset_factory
 
 class ProductForm(forms.ModelForm):
@@ -47,3 +47,12 @@ class CategoryForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['name'].widget.attrs.update({'class': 'form-control'})
         self.fields['description'].widget.attrs.update({'class': 'form-control'})
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write your review here...'}),
+        }
