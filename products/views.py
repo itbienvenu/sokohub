@@ -81,7 +81,7 @@ def vendor_dashboard(request):
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, user=request.user)
-        formset = ProductImageFormSet(request.POST, request.FILES)
+        formset = ProductImageFormSet(request.POST, request.FILES, prefix='additional_images')
         if form.is_valid() and formset.is_valid():
             product = form.save(commit=False)
             product.vendor = request.user
@@ -96,7 +96,7 @@ def add_product(request):
             return redirect('vendor_product_list')
     else:
         form = ProductForm(user=request.user)
-        formset = ProductImageFormSet()
+        formset = ProductImageFormSet(prefix='additional_images')
     return render(request, 'products/product_form.html', {
         'form': form, 
         'formset': formset,
@@ -108,14 +108,14 @@ def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk, vendor=request.user)
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product, user=request.user)
-        formset = ProductImageFormSet(request.POST, request.FILES, instance=product)
+        formset = ProductImageFormSet(request.POST, request.FILES, instance=product, prefix='additional_images')
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
             return redirect('vendor_product_list')
     else:
         form = ProductForm(instance=product, user=request.user)
-        formset = ProductImageFormSet(instance=product)
+        formset = ProductImageFormSet(instance=product, prefix='additional_images')
     return render(request, 'products/product_form.html', {
         'form': form, 
         'formset': formset,
@@ -144,7 +144,7 @@ def vendor_product_list(request):
         products = products.order_by('-avg_rating', '-created_at')
     elif sort_by == 'review_count_desc':
         products = products.order_by('-review_count', '-created_at')
-    else: # default
+    else:
         products = products.order_by('-created_at')
         
     return render(request, 'products/vendor_product_list.html', {
