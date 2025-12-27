@@ -65,9 +65,6 @@ def verify_otp(request):
         
         user_id = otp_obj.user.pk
         
-        # Clear sensitive session data as we move to token-based URL
-        # But keeping it might be useful if we wanted to verify user in next step too.
-        # For now, following original flow:
         return redirect('set_new_password', user_id=user_id, token=submitted_otp_hash)
 
     return render(request, 'accounts/reset_password_confirm.html')

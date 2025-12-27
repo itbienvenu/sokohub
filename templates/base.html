@@ -295,13 +295,6 @@
         const ctBase64 = encrypted.toString();
         const payloadString = `${ivBase64}:${ctBase64}`;
 
-        const response = await fetch('{% url "ai_chat" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ payload: payloadString })
-        });
 
         const data = await response.json();
 
