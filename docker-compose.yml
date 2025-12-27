@@ -13,7 +13,7 @@ services:
     environment:
       - DEBUG=0
       - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=sokohub_db
+      - SQL_DATABASE=sokoto_db
       - SQL_USER=sokohub
       - SQL_PASSWORD=sokohub_password
       - SQL_HOST=db
